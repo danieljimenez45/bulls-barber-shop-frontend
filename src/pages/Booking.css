@@ -1,0 +1,138 @@
+.booking-layout {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 3rem;
+  align-items: start;
+}
+
+.booking-form {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 2.5rem;
+}
+
+.booking-form h3 {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.25rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+/* DatePicker override */
+.datepicker-input {
+  width: 100%;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  outline: none;
+  transition: var(--transition);
+}
+
+.datepicker-input:focus {
+  border-color: var(--gold);
+}
+
+.react-datepicker {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  font-family: var(--font-body) !important;
+}
+
+.react-datepicker__header {
+  background: var(--bg-secondary) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name {
+  color: var(--text-primary) !important;
+}
+
+.react-datepicker__day {
+  color: var(--text-secondary) !important;
+}
+
+.react-datepicker__day:hover {
+  background: var(--gold-dark) !important;
+  color: #000 !important;
+}
+
+.react-datepicker__day--selected {
+  background: var(--gold) !important;
+  color: #000 !important;
+}
+
+.react-datepicker__day--disabled {
+  color: var(--text-muted) !important;
+}
+
+/* Info lateral */
+.booking-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: sticky;
+  top: 6rem;
+}
+
+.booking-info__card {
+  padding: 1.75rem;
+}
+
+.booking-info__card h4 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1rem;
+}
+
+.booking-info__card ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.booking-info__card li {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.booking-info__card li strong {
+  color: var(--text-primary);
+}
+
+.booking-info__card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+@media (max-width: 900px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .booking-info {
+    position: static;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
