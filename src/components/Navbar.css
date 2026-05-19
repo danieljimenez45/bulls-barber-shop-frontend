@@ -4,15 +4,16 @@
   left: 0;
   right: 0;
   z-index: 100;
-  padding: 1.25rem 0;
-  transition: var(--transition);
+  padding: 1.5rem 0;
+  transition: background 0.3s ease, padding 0.3s ease, border 0.3s ease;
 }
 
 .navbar--scrolled {
-  background: rgba(10, 10, 10, 0.95);
-  backdrop-filter: blur(12px);
+  background: rgba(9, 9, 9, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border);
-  padding: 0.75rem 0;
+  padding: 0.9rem 0;
 }
 
 .navbar__inner {
@@ -21,81 +22,72 @@
   gap: 2rem;
 }
 
+/* Logo: BULLS y SHOP en blanco, BARBER en rojo */
 .navbar__logo {
   font-family: var(--font-heading);
   font-weight: 900;
-  font-size: 1.4rem;
-  letter-spacing: 0.1em;
+  font-size: 1.1rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--text-primary);
+  color: var(--white);
+  flex-shrink: 0;
 }
-
-.navbar__logo span {
-  color: var(--gold);
-}
+.navbar__logo span { color: var(--brand); }
 
 .navbar__links {
   display: flex;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0;
   margin-left: auto;
 }
 
 .navbar__link {
-  padding: 0.5rem 0.9rem;
-  font-size: 0.875rem;
+  display: block;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--text-secondary);
   border-radius: var(--radius);
-  transition: var(--transition);
+  transition: color 0.2s ease;
 }
-
-.navbar__link:hover,
-.navbar__link--active {
-  color: var(--gold);
-}
+.navbar__link:hover      { color: var(--white); }
+.navbar__link--active    { color: var(--white); }
 
 .navbar__cta {
-  margin-left: 1rem;
-  padding: 0.6rem 1.4rem;
-  font-size: 0.8rem;
+  margin-left: 1.25rem;
+  padding: 0.6rem 1.3rem;
+  font-size: 0.72rem;
 }
 
 .navbar__burger {
   display: none;
-  color: var(--text-primary);
-  font-size: 1.4rem;
+  color: var(--white);
+  font-size: 1.25rem;
   margin-left: auto;
+  padding: 0.25rem;
 }
 
-/* ── Móvil ── */
+/* ── Móvil ─────────────────────────────────────────────────────────────── */
 .navbar__mobile {
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
   padding: 1.5rem;
 }
-
 .navbar__mobile ul {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
-
 .navbar__mobile .navbar__link {
-  display: block;
+  font-size: 0.9rem;
   padding: 0.75rem 1rem;
-  font-size: 1rem;
+  border-radius: var(--radius);
 }
 
 @media (max-width: 768px) {
   .navbar__links,
-  .navbar__cta {
-    display: none;
-  }
-
-  .navbar__burger {
-    display: block;
-  }
+  .navbar__cta   { display: none; }
+  .navbar__burger { display: block; }
 }

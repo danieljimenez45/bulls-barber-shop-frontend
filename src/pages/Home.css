@@ -1,216 +1,284 @@
-/* ── Hero ─────────────────────────────────────────────────────────────────── */
+/* ── Hero ─────────────────────────────────────────────────────────────────
+   Negro puro, tipografía enorme, sin rellenos de color.
+   Inspirado en Floyd's 99, Steven Tabach, Abel's on Queen.             */
 .hero {
   min-height: 100vh;
   display: flex;
   align-items: center;
   position: relative;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+  background: var(--bg-primary);
   overflow: hidden;
 }
 
-/* Patrón de fondo sutil */
+/* Textura muy sutil — ruido de fondo */
 .hero::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(circle at 20% 50%, rgba(201, 168, 76, 0.06) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, rgba(204, 34, 34, 0.04) 0%, transparent 40%);
+    radial-gradient(ellipse 80% 60% at 10% 60%, rgba(204,32,32,0.05) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 90% 10%, rgba(255,255,255,0.02) 0%, transparent 50%);
   pointer-events: none;
 }
 
-.hero__overlay {
+/* Foto de fondo opcional */
+.hero__bg {
   position: absolute;
   inset: 0;
   background: url('/hero-bg.jpg') center/cover no-repeat;
-  opacity: 0.12;
+  opacity: 0.07;
 }
 
 .hero__content {
   position: relative;
   z-index: 1;
-  padding-top: 6rem;
-  padding-bottom: 4rem;
+  padding-top: 7rem;
+  padding-bottom: 5rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 4rem;
 }
 
-.hero__text {
-  max-width: 680px;
-}
+/* Lado izquierdo — texto */
+.hero__left {}
 
-.hero__eyebrow {
-  display: inline-block;
-  font-size: 0.8rem;
+.hero__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--gold);
-  border: 1px solid var(--gold);
-  padding: 0.3rem 0.9rem;
-  border-radius: 100px;
+  color: var(--text-secondary);
+  margin-bottom: 2rem;
+}
+
+.hero__tag::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--brand);
+}
+
+.hero__title {
+  font-size: clamp(4rem, 7vw, 7.5rem);
+  font-weight: 900;
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+  color: var(--white);
   margin-bottom: 1.5rem;
 }
 
-.hero__text h1 {
-  font-size: clamp(3.5rem, 8vw, 7rem);
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  margin-bottom: 1.25rem;
+/* Solo "BARBER" en rojo — marca el acento de identidad */
+.hero__title .brand-word {
+  color: var(--brand);
 }
 
-.hero__text h1 span {
-  color: var(--gold);
-}
-
-.hero__text p {
-  font-size: 1.2rem;
+.hero__desc {
+  font-size: 1rem;
   color: var(--text-secondary);
+  line-height: 1.7;
   margin-bottom: 2.5rem;
+  max-width: 400px;
 }
 
 .hero__actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
-.hero__scroll {
-  position: absolute;
-  bottom: 2rem;
-  left: 50%;
-  transform: translateX(-50%);
+/* Lado derecho — dato visual */
+.hero__right {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  border-left: 1px solid var(--border);
+  padding-left: 3rem;
 }
 
-.hero__scroll span {
-  display: block;
-  width: 2px;
-  height: 50px;
-  background: linear-gradient(to bottom, var(--gold), transparent);
-  margin: 0 auto;
-  animation: scrollLine 1.8s ease-in-out infinite;
-}
-
-@keyframes scrollLine {
-  0% { transform: scaleY(0); transform-origin: top; }
-  50% { transform: scaleY(1); transform-origin: top; }
-  51% { transform: scaleY(1); transform-origin: bottom; }
-  100% { transform: scaleY(0); transform-origin: bottom; }
-}
-
-/* ── Stats ────────────────────────────────────────────────────────────────── */
-.stats {
-  background: var(--bg-secondary);
-  border-top: 1px solid var(--border);
+.hero__stat {
+  padding: 1.75rem 0;
   border-bottom: 1px solid var(--border);
-  padding: 3rem 0;
 }
+.hero__stat:last-child { border-bottom: none; }
 
-.stats__grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2rem;
-  text-align: center;
-}
-
-.stat strong {
-  display: block;
+.hero__stat-value {
   font-family: var(--font-heading);
   font-size: 2.5rem;
   font-weight: 900;
-  color: var(--gold);
+  color: var(--white);
+  line-height: 1;
+  margin-bottom: 0.25rem;
 }
 
-.stat span {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
+.hero__stat-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: var(--text-secondary);
 }
 
-/* ── Services grid ────────────────────────────────────────────────────────── */
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-}
-
-/* ── CTA Banner ───────────────────────────────────────────────────────────── */
-.cta-banner {
-  background: linear-gradient(135deg, var(--gold-dark) 0%, var(--gold) 100%);
-  padding: 4rem 0;
-}
-
-.cta-banner__inner {
+/* Scroll hint */
+.hero__scroll {
+  position: absolute;
+  bottom: 2.5rem;
+  left: 1.5rem;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 2rem;
+  gap: 0.75rem;
+  color: var(--text-muted);
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
 }
 
-.cta-banner__inner h2 {
-  font-size: clamp(1.5rem, 3vw, 2.2rem);
-  font-weight: 900;
-  color: #000;
+.hero__scroll::after {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 50px;
+  background: linear-gradient(to bottom, var(--border-light), transparent);
 }
 
-.cta-banner__inner h2 span {
-  text-decoration: underline;
+/* ── Franja separadora ────────────────────────────────────────────────────── */
+.divider-strip {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 2.5rem 0;
+  background: var(--bg-secondary);
+  overflow: hidden;
 }
 
-.cta-banner__inner p {
-  color: rgba(0, 0, 0, 0.7);
-  margin-top: 0.3rem;
+.divider-strip__inner {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.cta-banner .btn-gold {
-  background: #000;
-  color: var(--gold);
+.divider-strip__item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
   white-space: nowrap;
+}
+
+.divider-strip__dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--brand);
   flex-shrink: 0;
 }
 
-.cta-banner .btn-gold:hover {
-  background: #111;
+/* ── Grids ────────────────────────────────────────────────────────────────── */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
-/* ── Reviews grid ─────────────────────────────────────────────────────────── */
 .reviews-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
 }
 
-/* ── Dark section ─────────────────────────────────────────────────────────── */
-.section--dark {
+/* ── CTA Section — oscuro, sin relleno rojo ─────────────────────────────── */
+.cta-section {
   background: var(--bg-secondary);
   border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 5rem 0;
 }
 
-/* ── Responsive ───────────────────────────────────────────────────────────── */
-@media (max-width: 1024px) {
-  .services-grid,
-  .reviews-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.cta-section__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+}
 
-  .stats__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.cta-section__text h2 {
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  color: var(--white);
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+}
+
+/* La palabra clave en rojo — acento mínimo */
+.cta-section__text h2 em {
+  font-style: normal;
+  color: var(--brand);
+}
+
+.cta-section__text p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.cta-section__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.cta-section__phone {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+/* ── Instagram ───────────────────────────────────────────────────────────── */
+.ig-section {
+  padding: var(--section-py) 0;
+  text-align: center;
+}
+
+.ig-section__icon {
+  font-size: 2rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .hero__content    { grid-template-columns: 1fr; }
+  .hero__right      { display: none; }
+  .services-grid,
+  .reviews-grid     { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
   .services-grid,
-  .reviews-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stats__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .cta-banner__inner {
-    flex-direction: column;
-    text-align: center;
-  }
+  .reviews-grid     { grid-template-columns: 1fr; }
+  .cta-section__inner  { flex-direction: column; text-align: center; }
+  .cta-section__actions { align-items: center; }
+  .hero__title      { font-size: 3.5rem; }
 }

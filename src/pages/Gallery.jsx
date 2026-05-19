@@ -10,7 +10,7 @@ const CATEGORIAS = ["todas", "corte", "barba", "local"];
 // Placeholders hasta tener imágenes reales
 const PLACEHOLDER = Array.from({ length: 9 }, (_, i) => ({
   id: i + 1,
-  imagen_url: `https://placehold.co/600x600/1a1a1a/c9a84c?text=Bulls+${i + 1}`,
+  imagen_url: `https://placehold.co/600x600/1a1a1a/ffffff?text=Bulls+${i + 1}`,
   titulo: `Trabajo ${i + 1}`,
   categoria: ["corte", "barba", "local"][i % 3],
 }));
@@ -29,7 +29,7 @@ export default function Gallery() {
       <section className="page-header">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="gold-line" />
+            <div className="accent-line" />
             <h1 className="section-title">
               Nuestra <span>galería</span>
             </h1>

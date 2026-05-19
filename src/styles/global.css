@@ -1,17 +1,9 @@
 @import './variables.css';
 
-/* ── Reset & Base ─────────────────────────────────────────────────────────── */
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
+/* ── Reset ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html  { scroll-behavior: smooth; }
+body  {
   background-color: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-body);
@@ -19,181 +11,164 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
 }
+h1,h2,h3,h4,h5,h6 { font-family: var(--font-heading); font-weight: 700; line-height: 1.15; }
+a   { color: inherit; text-decoration: none; }
+img { max-width: 100%; display: block; }
+ul  { list-style: none; }
+button { cursor: pointer; border: none; background: none; font-family: inherit; }
+input, textarea, select { font-family: inherit; }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-heading);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-img {
-  max-width: 100%;
-  display: block;
-}
-
-ul {
-  list-style: none;
-}
-
-button {
-  cursor: pointer;
-  border: none;
-  background: none;
-  font-family: inherit;
-}
-
-input, textarea, select {
-  font-family: inherit;
-}
-
-/* ── Utilidades ───────────────────────────────────────────────────────────── */
+/* ── Layout ──────────────────────────────────────────────────────────────── */
 .container {
   width: 100%;
   max-width: var(--container);
   margin: 0 auto;
   padding: 0 1.5rem;
 }
+.section { padding: var(--section-py) 0; }
 
-.section {
-  padding: var(--section-py) 0;
+/* ── Tipografía de sección ───────────────────────────────────────────────── */
+.section-label {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brand);           /* rojo solo en esta etiqueta pequeña */
+  margin-bottom: 1rem;
 }
 
 .section-title {
   font-size: clamp(2rem, 4vw, 3rem);
   font-weight: 900;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  margin-bottom: 0.5rem;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  margin-bottom: 0.75rem;
 }
 
-.section-title span {
-  color: var(--gold);
-}
+.section-title span { color: var(--white); }   /* sin color especial — todo blanco */
 
 .section-subtitle {
   color: var(--text-secondary);
-  font-size: 1.05rem;
-  margin-bottom: 3rem;
+  font-size: 1rem;
+  margin-bottom: 3.5rem;
+  max-width: 520px;
 }
 
-.gold-line {
-  width: 60px;
-  height: 3px;
-  background: var(--gold);
+/* Línea decorativa fina — blanca */
+.accent-line {
+  width: 40px;
+  height: 2px;
+  background: var(--white);
   margin-bottom: 1.5rem;
+  opacity: 0.3;
 }
 
-/* ── Botones ──────────────────────────────────────────────────────────────── */
+/* Divisor horizontal de sección */
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* ── Botones ─────────────────────────────────────────────────────────────── */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.8rem 2rem;
+  padding: 0.85rem 2rem;
   border-radius: var(--radius);
   font-family: var(--font-heading);
   font-weight: 700;
-  font-size: 0.9rem;
-  letter-spacing: 0.06em;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   transition: var(--transition);
+  white-space: nowrap;
 }
 
-.btn-gold {
-  background: var(--gold);
+/* Botón primario — blanco sólido */
+.btn-primary {
+  background: var(--white);
   color: #000;
 }
-
-.btn-gold:hover {
-  background: var(--gold-light);
+.btn-primary:hover {
+  background: #e8e8e8;
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(201, 168, 76, 0.3);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.5);
 }
 
+/* Botón outline — borde blanco translúcido */
 .btn-outline {
-  border: 2px solid var(--gold);
-  color: var(--gold);
+  border: 1px solid var(--white-12);
+  color: var(--white-90);
 }
-
 .btn-outline:hover {
-  background: var(--gold);
-  color: #000;
-  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.4);
+  background: var(--white-06);
 }
 
-/* ── Cards ────────────────────────────────────────────────────────────────── */
+/* Botón rojo — SOLO para el CTA "Reservar cita" */
+.btn-gold {
+  background: var(--brand);
+  color: #fff;
+}
+.btn-gold:hover {
+  background: var(--brand-light);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 24px rgba(204,32,32,0.3);
+}
+
+/* ── Cards ───────────────────────────────────────────────────────────────── */
 .card {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   transition: var(--transition);
 }
-
 .card:hover {
-  border-color: var(--gold);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+  border-color: var(--border-light);
+  transform: translateY(-3px);
+  box-shadow: 0 16px 40px rgba(0,0,0,0.5);
 }
 
-/* ── Formularios ──────────────────────────────────────────────────────────── */
+/* ── Formularios ─────────────────────────────────────────────────────────── */
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.4rem;
   margin-bottom: 1.25rem;
 }
-
 .form-group label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  color: var(--text-secondary);
 }
-
 .form-group input,
 .form-group textarea,
 .form-group select {
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius);
   color: var(--text-primary);
   padding: 0.75rem 1rem;
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: var(--transition);
   outline: none;
 }
-
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-  border-color: var(--gold);
-  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
+  border-color: rgba(255,255,255,0.3);
+  background: var(--bg-tertiary);
 }
+.form-group textarea { resize: vertical; min-height: 120px; }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 120px;
-}
-
-/* ── Scrollbar personalizado ──────────────────────────────────────────────── */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--gold);
-}
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-primary); }
+::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

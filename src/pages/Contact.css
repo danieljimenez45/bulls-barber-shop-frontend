@@ -19,7 +19,7 @@
 
 .contact-info__block > svg {
   font-size: 1.25rem;
-  color: var(--gold);
+  color: var(--brand);
   flex-shrink: 0;
   margin-top: 3px;
 }
@@ -29,7 +29,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--text-muted);
   margin-bottom: 0.25rem;
 }
 
@@ -39,14 +39,14 @@
 }
 
 .contact-info__link {
-  color: var(--gold);
+  color: var(--white);
   font-size: 0.875rem;
   font-weight: 600;
   transition: var(--transition);
 }
 
 .contact-info__link:hover {
-  color: var(--gold-light);
+  color: var(--brand-light);
 }
 
 .contact-info__socials h4 {
@@ -54,7 +54,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--text-muted);
   margin-bottom: 0.75rem;
 }
 
@@ -76,8 +76,8 @@
 }
 
 .contact-info__social-links a:hover {
-  border-color: var(--gold);
-  color: var(--gold);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--white);
 }
 
 .contact-map {
@@ -98,7 +98,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--white);
   margin-bottom: 1.5rem;
 }
 

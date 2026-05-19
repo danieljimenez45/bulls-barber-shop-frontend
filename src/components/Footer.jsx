@@ -6,29 +6,21 @@ export default function Footer() {
   return (
     <footer className="footer">
       <div className="container footer__grid">
+
         {/* Marca */}
         <div className="footer__brand">
           <div className="footer__logo">
-            BULLS <span>BARBER</span>
+            BULLS <span>BARBER</span> SHOP
           </div>
           <p className="footer__tagline">
-            Donde cada corte cuenta una historia.
+            Barbería para todo tipo de estilos — clásicos, modernos.
+            Nos acoplamos a lo que mejor te quede.
           </p>
           <div className="footer__socials">
-            <a
-              href="https://www.instagram.com/bulls.barber.shop98/"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Instagram"
-            >
+            <a href="https://www.instagram.com/bulls.barber.shop98/" target="_blank" rel="noreferrer" aria-label="Instagram">
               <FaInstagram />
             </a>
-            <a
-              href="https://www.tiktok.com/@bulls.barber.shop98"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="TikTok"
-            >
+            <a href="https://www.tiktok.com/@bulls.barber.shop98" target="_blank" rel="noreferrer" aria-label="TikTok">
               <FaTiktok />
             </a>
           </div>
@@ -49,30 +41,35 @@ export default function Footer() {
 
         {/* Contacto */}
         <div className="footer__col">
-          <h4>Encuéntranos</h4>
+          <h4>Dónde estamos</h4>
           <ul className="footer__info">
             <li>
               <FaMapMarkerAlt />
-              <span>Ver en Google Maps</span>
+              <a href="https://maps.app.goo.gl/8BysbHvzzH2kodWL7" target="_blank" rel="noreferrer">
+                C. de Pepe Isbert, 5<br />
+                Cdad. Lineal, 28017 Madrid
+              </a>
             </li>
             <li>
               <FaPhone />
-              <span>Llámanos o WhatsApp</span>
+              <a href="tel:+34632548698">632 548 698</a>
             </li>
             <li>
               <FaClock />
               <div>
                 <p>Lun – Vie: 9:00 – 20:00</p>
-                <p>Sáb: 9:00 – 18:00</p>
-                <p>Dom: Cerrado</p>
+                <p>Sábado: 9:00 – 18:00</p>
+                <p>Domingo: Cerrado</p>
               </div>
             </li>
           </ul>
         </div>
+
       </div>
 
-      <div className="footer__bottom">
-        <p>© {new Date().getFullYear()} Bulls Barber Shop. Todos los derechos reservados.</p>
+      <div className="footer__bottom container">
+        <p>© {new Date().getFullYear()} Bulls Barber Shop · C. de Pepe Isbert 5, Ciudad Lineal, Madrid</p>
+        <p>Solo cita previa · 632 548 698</p>
       </div>
     </footer>
   );

@@ -1,36 +1,46 @@
 :root {
-  /* ── Colores ─────────────────────────────────────────── */
-  --bg-primary:    #0a0a0a;
-  --bg-secondary:  #111111;
-  --bg-card:       #1a1a1a;
-  --bg-card-hover: #222222;
-  --border:        #2a2a2a;
-  --border-light:  #333333;
+  /* ── Fondos ───────────────────────────────────────────────────────────── */
+  --bg-primary:   #090909;
+  --bg-secondary: #101010;
+  --bg-tertiary:  #161616;
+  --bg-card:      #181818;
+  --border:       #1e1e1e;
+  --border-light: #282828;
 
-  /* Acento dorado — elegante, masculino */
-  --gold:          #c9a84c;
-  --gold-light:    #e8c97a;
-  --gold-dark:     #a07830;
+  /* ── Rojo de marca ─────────────────────────────────────────────────────
+     Aparece ÚNICAMENTE en:
+       · La palabra "BARBER" del logo
+       · Tags de categoría en ServiceCard
+       · El botón "Reservar cita" (CTA principal)
+       · Estrellas de valoración
+       · Favicon
+     NO se usa como fondo de secciones ni bordes generales.           */
+  --brand:       #CC2020;
+  --brand-light: #E03535;
+  --brand-dark:  #991515;
 
-  /* Rojo Bulls */
-  --red:           #cc2222;
-  --red-light:     #e03333;
+  /* ── Sistema blanco — UI principal ────────────────────────────────────── */
+  --white:    #ffffff;
+  --white-90: rgba(255,255,255,0.9);
+  --white-12: rgba(255,255,255,0.12);
+  --white-06: rgba(255,255,255,0.06);
+  --white-03: rgba(255,255,255,0.03);
 
-  /* Texto */
-  --text-primary:  #ffffff;
-  --text-secondary:#a0a0a0;
-  --text-muted:    #555555;
+  /* ── Texto ─────────────────────────────────────────────────────────────── */
+  --text-primary:   #f0f0f0;
+  --text-secondary: #6a6a6a;
+  --text-muted:     #3a3a3a;
 
-  /* ── Tipografía ──────────────────────────────────────── */
+  /* ── Tipografía ─────────────────────────────────────────────────────────── */
   --font-heading: 'Montserrat', sans-serif;
   --font-body:    'Inter', sans-serif;
 
-  /* ── Espaciado ───────────────────────────────────────── */
-  --section-py:   5rem;
-  --container:    1200px;
-  --radius:       8px;
-  --radius-lg:    16px;
+  /* ── Layout ─────────────────────────────────────────────────────────────── */
+  --section-py: 6rem;
+  --container:  1200px;
+  --radius:     4px;
+  --radius-lg:  10px;
 
-  /* ── Transiciones ────────────────────────────────────── */
-  --transition:   all 0.25s ease;
+  /* ── Transiciones ───────────────────────────────────────────────────────── */
+  --transition: all 0.2s ease;
 }

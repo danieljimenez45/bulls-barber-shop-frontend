@@ -73,7 +73,7 @@ export default function Booking() {
       <section className="page-header">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="gold-line" />
+            <div className="accent-line" />
             <h1 className="section-title">
               Reserva tu <span>cita</span>
             </h1>

@@ -1,19 +1,20 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { FaMapMarkerAlt, FaPhone, FaClock, FaInstagram, FaTiktok } from "react-icons/fa";
+import { FaMapMarkerAlt, FaPhone, FaClock, FaInstagram, FaTiktok, FaWhatsapp } from "react-icons/fa";
 import { sendContact } from "../services/api";
 import "./Contact.css";
 
 export default function Contact() {
-  const [form, setForm] = useState({ nombre: "", email: "", telefono: "", asunto: "", mensaje: "" });
+  const [form, setForm] = useState({
+    nombre: "", email: "", telefono: "", asunto: "", mensaje: "",
+  });
   const [enviando, setEnviando] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.nombre || !form.email || !form.mensaje) {
+    if (!form.nombre || !form.email || !form.mensaje)
       return toast.error("Rellena los campos obligatorios");
-    }
     setEnviando(true);
     try {
       await sendContact(form);
@@ -31,26 +32,24 @@ export default function Contact() {
       <section className="page-header">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-            <div className="gold-line" />
-            <h1 className="section-title">
-              <span>Contacto</span>
-            </h1>
-            <p className="section-subtitle">
-              Estamos aquí para lo que necesites.
-            </p>
+            <div className="accent-line" />
+            <h1 className="section-title"><span>Contacto</span></h1>
+            <p className="section-subtitle">Estamos aquí para lo que necesites.</p>
           </motion.div>
         </div>
       </section>
 
       <section className="section">
         <div className="container contact-layout">
-          {/* Info */}
+
+          {/* ── Info ── */}
           <div className="contact-info">
+
             <div className="contact-info__block">
               <FaMapMarkerAlt />
               <div>
                 <h4>Ubicación</h4>
-                <p>Ver en Google Maps</p>
+                <p>C. de Pepe Isbert, 5<br />Cdad. Lineal, 28017 Madrid</p>
                 <a
                   href="https://maps.app.goo.gl/8BysbHvzzH2kodWL7"
                   target="_blank"
@@ -66,7 +65,12 @@ export default function Contact() {
               <FaPhone />
               <div>
                 <h4>Teléfono / WhatsApp</h4>
-                <p>Llámanos o escríbenos</p>
+                <a href="tel:+34632548698" className="contact-info__link">
+                  632 548 698
+                </a>
+                <p style={{ marginTop: "0.25rem", fontSize: "0.85rem" }}>
+                  Jonathan — Barbero principal
+                </p>
               </div>
             </div>
 
@@ -77,36 +81,50 @@ export default function Contact() {
                 <p>Lun – Vie: 9:00 – 20:00</p>
                 <p>Sábado: 9:00 – 18:00</p>
                 <p>Domingo: Cerrado</p>
+                <p style={{ marginTop: "0.25rem", fontSize: "0.8rem", color: "var(--text-muted)" }}>
+                  Solo con cita previa
+                </p>
               </div>
             </div>
 
             <div className="contact-info__socials">
               <h4>Síguenos</h4>
               <div className="contact-info__social-links">
-                <a href="https://www.instagram.com/bulls.barber.shop98/" target="_blank" rel="noreferrer">
+                <a
+                  href="https://www.instagram.com/bulls.barber.shop98/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <FaInstagram /> Instagram
                 </a>
-                <a href="https://www.tiktok.com/@bulls.barber.shop98" target="_blank" rel="noreferrer">
+                <a
+                  href="https://www.tiktok.com/@bulls.barber.shop98"
+                  target="_blank"
+                  rel="noreferrer"
+                >
                   <FaTiktok /> TikTok
+                </a>
+                <a href="https://wa.me/34632548698" target="_blank" rel="noreferrer">
+                  <FaWhatsapp /> WhatsApp
                 </a>
               </div>
             </div>
 
-            {/* Mapa */}
+            {/* Mapa — coordenadas reales: Alcorcón, Madrid */}
             <div className="contact-map">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d1!2d-3.7!3d40.4!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sBulls+Barber+Shop!5e0!3m2!1ses!2ses!4v1"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3036.7!2d-3.6290!3d40.4360!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xd422fa35f2d6819%3A0x5c4fca00da40383f!2sC.%20de%20Pepe%20Isbert%2C%205%2C%20Cdad.%20Lineal%2C%2028017%20Madrid!5e0!3m2!1ses!2ses!4v1"
                 width="100%"
                 height="250"
                 style={{ border: 0, borderRadius: "var(--radius)" }}
                 allowFullScreen
                 loading="lazy"
-                title="Ubicación Bulls Barber Shop"
+                title="Ubicación Bulls Barber Shop — Alcorcón, Madrid"
               />
             </div>
           </div>
 
-          {/* Formulario */}
+          {/* ── Formulario ── */}
           <form className="contact-form" onSubmit={handleSubmit}>
             <h3>Envíanos un mensaje</h3>
 
@@ -172,6 +190,7 @@ export default function Contact() {
               {enviando ? "Enviando…" : "Enviar mensaje"}
             </button>
           </form>
+
         </div>
       </section>
     </div>

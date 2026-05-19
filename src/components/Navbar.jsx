@@ -4,26 +4,22 @@ import { FaBars, FaTimes } from "react-icons/fa";
 import "./Navbar.css";
 
 const LINKS = [
-  { to: "/", label: "Inicio" },
+  { to: "/",          label: "Inicio"    },
   { to: "/servicios", label: "Servicios" },
-  { to: "/galeria", label: "Galería" },
-  { to: "/resenas", label: "Reseñas" },
-  { to: "/contacto", label: "Contacto" },
+  { to: "/galeria",   label: "Galería"   },
+  { to: "/resenas",   label: "Reseñas"   },
+  { to: "/contacto",  label: "Contacto"  },
 ];
 
 export default function Navbar() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen]       = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const location = useLocation();
+  const location              = useLocation();
 
-  // Cerrar menú al navegar
-  useEffect(() => {
-    setOpen(false);
-  }, [location]);
+  useEffect(() => { setOpen(false); }, [location]);
 
-  // Fondo al hacer scroll
   useEffect(() => {
-    const handler = () => setScrolled(window.scrollY > 60);
+    const handler = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handler);
     return () => window.removeEventListener("scroll", handler);
   }, []);
@@ -31,9 +27,10 @@ export default function Navbar() {
   return (
     <nav className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}>
       <div className="container navbar__inner">
+
         {/* Logo */}
         <Link to="/" className="navbar__logo">
-          BULLS <span>BARBER</span>
+          BULLS <span>BARBER</span> SHOP
         </Link>
 
         {/* Links desktop */}
@@ -59,11 +56,7 @@ export default function Navbar() {
         </Link>
 
         {/* Hamburger */}
-        <button
-          className="navbar__burger"
-          onClick={() => setOpen(!open)}
-          aria-label="Menú"
-        >
+        <button className="navbar__burger" onClick={() => setOpen(!open)} aria-label="Menú">
           {open ? <FaTimes /> : <FaBars />}
         </button>
       </div>
@@ -86,7 +79,7 @@ export default function Navbar() {
               </li>
             ))}
             <li>
-              <Link to="/reservar" className="btn btn-gold">
+              <Link to="/reservar" className="btn btn-gold" style={{ width: "100%", justifyContent: "center" }}>
                 Reservar cita
               </Link>
             </li>

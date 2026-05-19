@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaScissors, FaStar, FaArrowRight } from "react-icons/fa6";
+import { FaArrowRight } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { useApi } from "../hooks/useApi";
 import { getServices, getReviews } from "../services/api";
@@ -8,38 +8,52 @@ import ServiceCard from "../components/ServiceCard";
 import ReviewCard from "../components/ReviewCard";
 import "./Home.css";
 
-// ── Animaciones ───────────────────────────────────────────────────────────────
 const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  hidden: { opacity: 0, y: 24 },
+  show:   { opacity: 1, y: 0, transition: { duration: 0.55 } },
 };
+
+const SERVICES_PLACEHOLDER = [
+  { id: 1, nombre: "Corte clásico",  precio: 15, duracion_minutos: 30, categoria: "corte",  descripcion: "Tijera o máquina con acabado perfecto y detallado." },
+  { id: 2, nombre: "Corte + Barba",  precio: 22, duracion_minutos: 50, categoria: "combo",  descripcion: "El pack completo: corte y arreglo de barba al mejor precio." },
+  { id: 3, nombre: "Arreglo barba",  precio: 10, duracion_minutos: 20, categoria: "barba",  descripcion: "Perfilado, degradado y cuidado completo con navaja." },
+];
+
+const REVIEWS_PLACEHOLDER = [
+  { id: 1, nombre: "Carlos M.",    valoracion: 5, comentario: "El mejor corte que he tenido. Jonathan es un crack, salí encantado.", created_at: new Date().toISOString() },
+  { id: 2, nombre: "David R.",     valoracion: 5, comentario: "Llevo meses viniendo y siempre perfecto. Se adaptan totalmente a lo que pides.", created_at: new Date().toISOString() },
+  { id: 3, nombre: "Alejandro P.", valoracion: 5, comentario: "Precio justo, buen rollo y resultado impecable. 100% recomendado.", created_at: new Date().toISOString() },
+];
 
 export default function Home() {
   const { data: services } = useApi(() => getServices(), []);
-  const { data: reviews } = useApi(() => getReviews(), []);
+  const { data: reviews }  = useApi(() => getReviews(),  []);
 
-  const featuredServices = services?.slice(0, 3) ?? [];
-  const featuredReviews = reviews?.slice(0, 3) ?? [];
+  const featuredServices = services?.slice(0, 3) ?? SERVICES_PLACEHOLDER;
+  const featuredReviews  = reviews?.slice(0, 3)  ?? REVIEWS_PLACEHOLDER;
 
   return (
     <>
-      {/* ── HERO ───────────────────────────────────────────────────────────── */}
+      {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="hero">
-        <div className="hero__overlay" />
+        <div className="hero__bg" />
         <div className="container hero__content">
-          <motion.div
-            initial="hidden"
-            animate="show"
-            variants={fadeUp}
-            className="hero__text"
-          >
-            <span className="hero__eyebrow">Barbería profesional</span>
-            <h1>
-              BULLS <span>BARBER</span>
-              <br />
+
+          {/* Izquierda — headline + CTA */}
+          <motion.div className="hero__left" initial="hidden" animate="show" variants={fadeUp}>
+            <span className="hero__tag">Barbería · Ciudad Lineal, Madrid</span>
+
+            <h1 className="hero__title">
+              BULLS<br />
+              <span className="brand-word">BARBER</span><br />
               SHOP
             </h1>
-            <p>Cortes de precisión, estilo sin compromiso.</p>
+
+            <p className="hero__desc">
+              Para todo tipo de estilos — clásicos, modernos, fades y barba.
+              Nos adaptamos a ti y buscamos lo que mejor te quede.
+            </p>
+
             <div className="hero__actions">
               <Link to="/reservar" className="btn btn-gold">
                 Reservar cita <FaArrowRight />
@@ -49,68 +63,55 @@ export default function Home() {
               </Link>
             </div>
           </motion.div>
+
+          {/* Derecha — stats editoriales */}
+          <motion.div className="hero__right" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3, duration: 0.6 }}>
+            {[
+              { value: "312",  label: "Publicaciones en Instagram" },
+              { value: "5 ★",  label: "Valoración media de clientes" },
+              { value: "Solo", label: "Cita previa · 632 548 698" },
+              { value: "100%", label: "Dedicación y detalle" },
+            ].map((s) => (
+              <div key={s.label} className="hero__stat">
+                <div className="hero__stat-value">{s.value}</div>
+                <div className="hero__stat-label">{s.label}</div>
+              </div>
+            ))}
+          </motion.div>
+
         </div>
-        {/* Scroll hint */}
-        <div className="hero__scroll">
-          <span />
-        </div>
+
+        <div className="hero__scroll">Scroll</div>
       </section>
 
-      {/* ── NÚMEROS ────────────────────────────────────────────────────────── */}
-      <section className="stats">
-        <div className="container stats__grid">
-          {[
-            { value: "500+", label: "Clientes satisfechos" },
-            { value: "5★", label: "Valoración media" },
-            { value: "10+", label: "Años de experiencia" },
-            { value: "100%", label: "Dedicación" },
-          ].map((s) => (
-            <div key={s.label} className="stat">
-              <strong>{s.value}</strong>
-              <span>{s.label}</span>
+      {/* ── FRANJA ────────────────────────────────────────────────────────── */}
+      <div className="divider-strip">
+        <div className="container divider-strip__inner">
+          {["Cortes de precisión", "Degradados y fades", "Arreglo de barba", "C. Pepe Isbert 5 · Madrid", "632 548 698"].map((t) => (
+            <div key={t} className="divider-strip__item">
+              <span className="divider-strip__dot" />
+              {t}
             </div>
           ))}
         </div>
-      </section>
+      </div>
 
-      {/* ── SERVICIOS DESTACADOS ───────────────────────────────────────────── */}
+      {/* ── SERVICIOS ─────────────────────────────────────────────────────── */}
       <section className="section">
         <div className="container">
-          <motion.div
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            variants={fadeUp}
-          >
-            <div className="gold-line" />
-            <h2 className="section-title">
-              Nuestros <span>servicios</span>
-            </h2>
-            <p className="section-subtitle">
-              Cada detalle, cuidado a la perfección.
-            </p>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}>
+            <span className="section-label">Lo que ofrecemos</span>
+            <h2 className="section-title">Servicios</h2>
+            <p className="section-subtitle">Calidad y detalle en cada trabajo.</p>
           </motion.div>
 
-          {featuredServices.length > 0 ? (
-            <div className="services-grid">
-              {featuredServices.map((s) => (
-                <ServiceCard key={s.id} service={s} />
-              ))}
-            </div>
-          ) : (
-            /* Placeholder cuando la API aún no tiene datos */
-            <div className="services-grid">
-              {[
-                { id: 1, nombre: "Corte clásico", precio: 15, duracion_minutos: 30, categoria: "corte", descripcion: "Corte a tijera o máquina con acabado perfecto." },
-                { id: 2, nombre: "Corte + Barba", precio: 22, duracion_minutos: 50, categoria: "combo", descripcion: "Corte completo y arreglo de barba incluido." },
-                { id: 3, nombre: "Arreglo de barba", precio: 10, duracion_minutos: 20, categoria: "barba", descripcion: "Perfilado, degradado y cuidado de barba." },
-              ].map((s) => (
-                <ServiceCard key={s.id} service={s} />
-              ))}
-            </div>
-          )}
+          <div className="services-grid">
+            {featuredServices.map((s) => (
+              <ServiceCard key={s.id} service={s} />
+            ))}
+          </div>
 
-          <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
+          <div style={{ marginTop: "2.5rem" }}>
             <Link to="/servicios" className="btn btn-outline">
               Ver todos los servicios <FaArrowRight />
             </Link>
@@ -118,56 +119,42 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA BANNER ────────────────────────────────────────────────────── */}
-      <section className="cta-banner">
-        <div className="container cta-banner__inner">
-          <div>
-            <h2>¿Listo para tu próximo <span>corte?</span></h2>
-            <p>Reserva tu cita en segundos, sin esperas.</p>
+      <hr className="section-divider" />
+
+      {/* ── CTA ───────────────────────────────────────────────────────────── */}
+      <section className="cta-section">
+        <div className="container cta-section__inner">
+          <div className="cta-section__text">
+            <h2>¿Listo para tu próximo<br /><em>corte?</em></h2>
+            <p>Reserva en segundos. Sin esperas, con cita previa.</p>
           </div>
-          <Link to="/reservar" className="btn btn-gold">
-            Reservar ahora <FaArrowRight />
-          </Link>
+          <div className="cta-section__actions">
+            <Link to="/reservar" className="btn btn-gold">
+              Reservar cita <FaArrowRight />
+            </Link>
+            <span className="cta-section__phone">Tel. 632 548 698</span>
+          </div>
         </div>
       </section>
+
+      <hr className="section-divider" />
 
       {/* ── RESEÑAS ───────────────────────────────────────────────────────── */}
       <section className="section">
         <div className="container">
-          <motion.div
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
-            variants={fadeUp}
-          >
-            <div className="gold-line" />
-            <h2 className="section-title">
-              Lo que dicen <span>nuestros clientes</span>
-            </h2>
-            <p className="section-subtitle">
-              Opiniones reales de personas reales.
-            </p>
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}>
+            <span className="section-label">Opiniones reales</span>
+            <h2 className="section-title">Clientes</h2>
+            <p className="section-subtitle">Lo que dicen quienes nos visitan.</p>
           </motion.div>
 
-          {featuredReviews.length > 0 ? (
-            <div className="reviews-grid">
-              {featuredReviews.map((r) => (
-                <ReviewCard key={r.id} review={r} />
-              ))}
-            </div>
-          ) : (
-            <div className="reviews-grid">
-              {[
-                { id: 1, nombre: "Carlos M.", valoracion: 5, comentario: "El mejor corte que he tenido. Ambiente increíble y muy profesionales.", created_at: new Date().toISOString() },
-                { id: 2, nombre: "David R.", valoracion: 5, comentario: "Llevo meses viniendo y siempre salgo encantado. 100% recomendado.", created_at: new Date().toISOString() },
-                { id: 3, nombre: "Alejandro P.", valoracion: 5, comentario: "Trato genial, precio justo y resultado perfecto. Sin duda los mejores.", created_at: new Date().toISOString() },
-              ].map((r) => (
-                <ReviewCard key={r.id} review={r} />
-              ))}
-            </div>
-          )}
+          <div className="reviews-grid">
+            {featuredReviews.map((r) => (
+              <ReviewCard key={r.id} review={r} />
+            ))}
+          </div>
 
-          <div style={{ textAlign: "center", marginTop: "2.5rem" }}>
+          <div style={{ marginTop: "2.5rem" }}>
             <Link to="/resenas" className="btn btn-outline">
               Ver todas las reseñas <FaArrowRight />
             </Link>
@@ -175,22 +162,25 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── INSTAGRAM ────────────────────────────────────────────────────── */}
-      <section className="section section--dark">
-        <div className="container" style={{ textAlign: "center" }}>
-          <FaInstagram style={{ fontSize: "2rem", color: "var(--gold)", marginBottom: "1rem" }} />
-          <h2 className="section-title">
-            Síguenos en <span>Instagram</span>
-          </h2>
-          <p className="section-subtitle">@bulls.barber.shop98</p>
-          <a
-            href="https://www.instagram.com/bulls.barber.shop98/"
-            target="_blank"
-            rel="noreferrer"
-            className="btn btn-gold"
-          >
-            Ver perfil <FaInstagram />
-          </a>
+      <hr className="section-divider" />
+
+      {/* ── INSTAGRAM ─────────────────────────────────────────────────────── */}
+      <section className="ig-section">
+        <div className="container">
+          <motion.div initial="hidden" whileInView="show" viewport={{ once: true }} variants={fadeUp}>
+            <div className="ig-section__icon"><FaInstagram /></div>
+            <span className="section-label" style={{ justifyContent: "center", display: "flex" }}>Instagram</span>
+            <h2 className="section-title" style={{ marginBottom: "0.5rem" }}>@bulls.barber.shop98</h2>
+            <p className="section-subtitle">312 publicaciones · sigue el trabajo de Jonathan.</p>
+            <a
+              href="https://www.instagram.com/bulls.barber.shop98/"
+              target="_blank"
+              rel="noreferrer"
+              className="btn btn-primary"
+            >
+              Ver perfil <FaInstagram />
+            </a>
+          </motion.div>
         </div>
       </section>
     </>

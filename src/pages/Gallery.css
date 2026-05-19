@@ -42,7 +42,7 @@
 .gallery-item__overlay span {
   font-size: 0.875rem;
   font-weight: 600;
-  color: var(--gold);
+  color: var(--white);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -76,7 +76,7 @@
 }
 
 .lightbox__close:hover {
-  color: var(--gold);
+  color: var(--brand);
 }
 
 @media (max-width: 768px) {

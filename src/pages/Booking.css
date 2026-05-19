@@ -17,7 +17,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--brand);
   margin-bottom: 1.25rem;
 }
 
@@ -41,7 +41,7 @@
 }
 
 .datepicker-input:focus {
-  border-color: var(--gold);
+  border-color: var(--brand);
 }
 
 .react-datepicker {
@@ -65,13 +65,13 @@
 }
 
 .react-datepicker__day:hover {
-  background: var(--gold-dark) !important;
-  color: #000 !important;
+  background: var(--brand) !important;
+  color: #fff !important;
 }
 
 .react-datepicker__day--selected {
-  background: var(--gold) !important;
-  color: #000 !important;
+  background: var(--brand) !important;
+  color: #fff !important;
 }
 
 .react-datepicker__day--disabled {
@@ -96,7 +96,7 @@
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--brand);
   margin-bottom: 1rem;
 }
 
