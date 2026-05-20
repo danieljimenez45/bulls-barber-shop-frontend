@@ -7,6 +7,7 @@ import { registerLocale } from "react-datepicker";
 import { es } from "date-fns/locale";
 import { createBooking, getDisponibilidad, getServices } from "../services/api";
 import { useApi } from "../hooks/useApi";
+import SeoHead from "../components/SeoHead";
 import "./Booking.css";
 
 registerLocale("es", es);
@@ -141,6 +142,11 @@ export default function Booking() {
 
   return (
     <div className="page">
+      <SeoHead
+        title="Reserva tu cita"
+        canonical="/reservar"
+        description="Reserva tu cita en Bulls Barber Shop de forma rápida y sencilla. Elige fecha, hora y servicio. Sin esperas, confirmación inmediata."
+      />
       <section className="page-header">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { FaMapMarkerAlt, FaPhone, FaClock, FaInstagram, FaTiktok, FaWhatsapp } from "react-icons/fa";
 import { sendContact } from "../services/api";
+import SeoHead from "../components/SeoHead";
 import "./Contact.css";
 
 export default function Contact() {
@@ -29,6 +30,11 @@ export default function Contact() {
 
   return (
     <div className="page">
+      <SeoHead
+        title="Contacto"
+        canonical="/contacto"
+        description="Contacta con Bulls Barber Shop en Madrid. Estamos en C. de Pepe Isbert 5, Ciudad Lineal. Llámanos al 632 548 698 o escríbenos por Instagram o WhatsApp."
+      />
       <section className="page-header">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
 import { useApi } from "../hooks/useApi";
 import { getGallery } from "../services/api";
+import SeoHead from "../components/SeoHead";
 import "./Gallery.css";
 
 const CATEGORIAS = ["todas", "corte", "barba", "local"];
@@ -26,6 +27,11 @@ export default function Gallery() {
 
   return (
     <div className="page">
+      <SeoHead
+        title="Galería"
+        canonical="/galeria"
+        description="Echa un vistazo a nuestros trabajos en Bulls Barber Shop. Fotos reales de cortes, degradados y arreglos de barba realizados por nuestros barberos."
+      />
       <section className="page-header">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

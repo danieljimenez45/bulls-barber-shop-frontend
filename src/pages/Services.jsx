@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApi } from "../hooks/useApi";
 import { getServices } from "../services/api";
+import SeoHead from "../components/SeoHead";
 import ServiceCard from "../components/ServiceCard";
 import "./Services.css";
 
@@ -28,6 +29,11 @@ export default function Services() {
 
   return (
     <div className="page">
+      <SeoHead
+        title="Servicios"
+        canonical="/servicios"
+        description="Descubre todos los servicios de Bulls Barber Shop: corte de pelo, arreglo de barba, afeitado clásico y más. Precios claros y sin sorpresas."
+      />
       {/* Header */}
       <section className="page-header">
         <div className="container">

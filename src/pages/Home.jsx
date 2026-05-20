@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa6";
 import { FaInstagram } from "react-icons/fa";
 import { useApi } from "../hooks/useApi";
+import SeoHead from "../components/SeoHead";
 import { getServices, getReviews } from "../services/api";
 import ServiceCard from "../components/ServiceCard";
 import ReviewCard from "../components/ReviewCard";
@@ -34,6 +35,10 @@ export default function Home() {
 
   return (
     <>
+      <SeoHead
+        canonical="/"
+        description="Bulls Barber Shop — Barbería profesional en Madrid (Ciudad Lineal). Cortes modernos y clásicos, arreglo de barba y tratamientos. Reserva tu cita online sin esperas."
+      />
       {/* ── HERO ──────────────────────────────────────────────────────────── */}
       <section className="hero">
         <div className="hero__bg" />

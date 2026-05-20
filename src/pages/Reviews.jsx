@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useApi } from "../hooks/useApi";
 import { getReviews, createReview } from "../services/api";
+import SeoHead from "../components/SeoHead";
 import ReviewCard from "../components/ReviewCard";
 import "./Reviews.css";
 
@@ -28,6 +29,11 @@ export default function Reviews() {
 
   return (
     <div className="page">
+      <SeoHead
+        title="Reseñas"
+        canonical="/resenas"
+        description="Lee las opiniones de nuestros clientes en Bulls Barber Shop. Más de 5 estrellas en experiencia, trato y calidad de corte. Deja tu propia reseña."
+      />
       <section className="page-header">
         <div className="container">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>

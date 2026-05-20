@@ -1,11 +1,17 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaArrowLeft, FaScissors } from "react-icons/fa6";
+import SeoHead from "../components/SeoHead";
 import "./NotFound.css";
 
 export default function NotFound() {
   return (
     <div className="page notfound-page">
+      <SeoHead
+        title="Página no encontrada"
+        canonical=""
+        description="La página que buscas no existe. Vuelve al inicio de Bulls Barber Shop."
+      />
       <div className="container notfound-container">
         <motion.div
           className="notfound-content"
