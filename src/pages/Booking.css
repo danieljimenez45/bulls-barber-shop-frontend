@@ -123,6 +123,14 @@
   line-height: 1.5;
 }
 
+/* Hint de disponibilidad bajo el selector de hora */
+.slots-hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+  letter-spacing: 0.01em;
+}
+
 @media (max-width: 900px) {
   .booking-layout {
     grid-template-columns: 1fr;

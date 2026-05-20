@@ -1,24 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import toast from "react-hot-toast";
 import { registerLocale } from "react-datepicker";
 import { es } from "date-fns/locale";
-import { createBooking } from "../services/api";
+import { createBooking, getDisponibilidad, getServices } from "../services/api";
 import { useApi } from "../hooks/useApi";
-import { getServices } from "../services/api";
 import "./Booking.css";
 
 registerLocale("es", es);
 
-const HORARIOS = ["09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30"];
+const HORARIOS = [
+  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+  "12:00", "12:30", "16:00", "16:30", "17:00", "17:30",
+  "18:00", "18:30", "19:00", "19:30",
+];
 
 const BARBEROS = ["Cualquier barbero", "Barbero 1", "Barbero 2"];
 
+/** Formatea un objeto Date como "YYYY-MM-DD" para la API */
+const toApiDate = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+/** Extrae "HH:MM" de un string ISO datetime devuelto por el backend */
+const isoToHHMM = (isoString) => isoString.substring(11, 16);
+
 export default function Booking() {
   const { data: services } = useApi(() => getServices(), []);
+
   const [form, setForm] = useState({
     nombre_cliente: "",
     telefono: "",
@@ -31,10 +45,47 @@ export default function Booking() {
   const [hora, setHora] = useState("");
   const [enviando, setEnviando] = useState(false);
 
+  // Disponibilidad
+  const [slotsOcupados, setSlotsOcupados] = useState(new Set());
+  const [cargandoSlots, setCargandoSlots] = useState(false);
+
+  // Consultar disponibilidad cada vez que cambia la fecha
+  useEffect(() => {
+    if (!fecha) {
+      setSlotsOcupados(new Set());
+      return;
+    }
+
+    let cancelado = false;
+
+    const fetchDisponibilidad = async () => {
+      setCargandoSlots(true);
+      try {
+        const res = await getDisponibilidad(toApiDate(fecha));
+        if (cancelado) return;
+        const ocupados = new Set(res.data.slots_ocupados.map(isoToHHMM));
+        setSlotsOcupados(ocupados);
+        // Si la hora ya elegida queda ocupada, limpiarla y avisar
+        if (hora && ocupados.has(hora)) {
+          setHora("");
+          toast("Ese horario acaba de ocuparse, elige otro.", { icon: "⚠️" });
+        }
+      } catch {
+        if (!cancelado) setSlotsOcupados(new Set());
+      } finally {
+        if (!cancelado) setCargandoSlots(false);
+      }
+    };
+
+    fetchDisponibilidad();
+    return () => { cancelado = true; };
+  }, [fecha]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!fecha || !hora) return toast.error("Selecciona fecha y hora");
-    if (!form.nombre_cliente || !form.telefono) return toast.error("Rellena los campos obligatorios");
+    if (!form.nombre_cliente || !form.telefono)
+      return toast.error("Rellena los campos obligatorios");
     if (!form.servicio_id) return toast.error("Selecciona un servicio");
 
     const [h, m] = hora.split(":").map(Number);
@@ -52,21 +103,41 @@ export default function Booking() {
         fecha_hora: fechaHora.toISOString(),
       });
       toast.success("¡Reserva enviada! Te confirmaremos por teléfono.");
-      setForm({ nombre_cliente: "", telefono: "", email: "", servicio_id: "", barbero: "Cualquier barbero", notas: "" });
+      setForm({
+        nombre_cliente: "",
+        telefono: "",
+        email: "",
+        servicio_id: "",
+        barbero: "Cualquier barbero",
+        notas: "",
+      });
       setFecha(null);
       setHora("");
-    } catch {
-      toast.error("Error al crear la reserva. Inténtalo de nuevo.");
+      setSlotsOcupados(new Set());
+    } catch (err) {
+      if (err.response?.status === 409) {
+        // El slot se ocupó justo antes de enviar — refrescar disponibilidad
+        toast.error(
+          err.response.data?.detail ||
+            "Ese horario acaba de reservarse. Por favor elige otro.",
+          { duration: 6000 }
+        );
+        setHora("");
+        try {
+          const res = await getDisponibilidad(toApiDate(fecha));
+          setSlotsOcupados(new Set(res.data.slots_ocupados.map(isoToHHMM)));
+        } catch { /* silenciar */ }
+      } else {
+        toast.error("Error al crear la reserva. Inténtalo de nuevo.");
+      }
     } finally {
       setEnviando(false);
     }
   };
 
-  // No permitir domingos ni pasado
-  const isDisabled = (date) => {
-    const day = date.getDay();
-    return day === 0; // domingo
-  };
+  const isDisabled = (date) => date.getDay() === 0; // cerrado domingos
+
+  const slotsLibres = HORARIOS.filter((h) => !slotsOcupados.has(h)).length;
 
   return (
     <div className="page">
@@ -113,7 +184,7 @@ export default function Booking() {
             </div>
 
             <div className="form-group">
-              <label>Email (opcional)</label>
+              <label>Email (opcional — recibirás confirmación)</label>
               <input
                 type="email"
                 placeholder="tu@email.com"
@@ -168,14 +239,40 @@ export default function Booking() {
                   className="datepicker-input"
                 />
               </div>
+
               <div className="form-group">
                 <label>Hora *</label>
-                <select value={hora} onChange={(e) => setHora(e.target.value)} required>
-                  <option value="">Selecciona hora</option>
-                  {HORARIOS.map((h) => (
-                    <option key={h} value={h}>{h}</option>
-                  ))}
+                <select
+                  value={hora}
+                  onChange={(e) => setHora(e.target.value)}
+                  required
+                  disabled={!fecha || cargandoSlots}
+                >
+                  <option value="">
+                    {cargandoSlots
+                      ? "Consultando disponibilidad…"
+                      : fecha
+                      ? "Selecciona hora"
+                      : "Primero elige fecha"}
+                  </option>
+                  {HORARIOS.map((h) => {
+                    const ocupado = slotsOcupados.has(h);
+                    return (
+                      <option key={h} value={h} disabled={ocupado}>
+                        {h}{ocupado ? " — ocupado" : ""}
+                      </option>
+                    );
+                  })}
                 </select>
+                {fecha && !cargandoSlots && slotsOcupados.size > 0 && (
+                  <p className="slots-hint">
+                    {slotsLibres === 0
+                      ? "Sin huecos disponibles este día"
+                      : `${slotsOcupados.size} ${
+                          slotsOcupados.size === 1 ? "horario ocupado" : "horarios ocupados"
+                        } · ${slotsLibres} disponibles`}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -188,7 +285,12 @@ export default function Booking() {
               />
             </div>
 
-            <button type="submit" className="btn btn-gold" disabled={enviando} style={{ width: "100%", justifyContent: "center" }}>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={enviando || cargandoSlots}
+              style={{ width: "100%", justifyContent: "center" }}
+            >
               {enviando ? "Enviando…" : "Confirmar reserva"}
             </button>
           </form>

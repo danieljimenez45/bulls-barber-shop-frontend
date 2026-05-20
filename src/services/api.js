@@ -11,6 +11,8 @@ export const getServices = (categoria) =>
 
 // ── Reservas ─────────────────────────────────────────────────────────────────
 export const createBooking = (data) => api.post("/bookings", data);
+export const getDisponibilidad = (fecha) =>
+  api.get("/bookings/disponibilidad", { params: { fecha } });
 
 // ── Reseñas ──────────────────────────────────────────────────────────────────
 export const getReviews = () => api.get("/reviews", { params: { solo_visibles: true } });
