@@ -163,47 +163,54 @@ export default function Booking() {
 
       <section className="section">
         <div className="container booking-layout">
-          <form className="booking-form" onSubmit={handleSubmit}>
+          <form className="booking-form" onSubmit={handleSubmit} noValidate>
             <h3>Tus datos</h3>
 
             <div className="form-row">
               <div className="form-group">
-                <label>Nombre *</label>
+                <label htmlFor="booking-nombre">Nombre *</label>
                 <input
+                  id="booking-nombre"
                   type="text"
                   placeholder="Tu nombre completo"
                   value={form.nombre_cliente}
                   onChange={(e) => setForm({ ...form, nombre_cliente: e.target.value })}
                   required
+                  autoComplete="name"
                 />
               </div>
               <div className="form-group">
-                <label>Teléfono *</label>
+                <label htmlFor="booking-telefono">Teléfono *</label>
                 <input
+                  id="booking-telefono"
                   type="tel"
                   placeholder="+34 600 000 000"
                   value={form.telefono}
                   onChange={(e) => setForm({ ...form, telefono: e.target.value })}
                   required
+                  autoComplete="tel"
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label>Email (opcional — recibirás confirmación)</label>
+              <label htmlFor="booking-email">Email (opcional — recibirás confirmación)</label>
               <input
+                id="booking-email"
                 type="email"
                 placeholder="tu@email.com"
                 value={form.email}
                 onChange={(e) => setForm({ ...form, email: e.target.value })}
+                autoComplete="email"
               />
             </div>
 
             <h3 style={{ marginTop: "1.5rem" }}>Servicio</h3>
 
             <div className="form-group">
-              <label>Servicio *</label>
+              <label htmlFor="booking-servicio">Servicio *</label>
               <select
+                id="booking-servicio"
                 value={form.servicio_id}
                 onChange={(e) => setForm({ ...form, servicio_id: e.target.value })}
                 required
@@ -218,8 +225,9 @@ export default function Booking() {
             </div>
 
             <div className="form-group">
-              <label>Barbero</label>
+              <label htmlFor="booking-barbero">Barbero</label>
               <select
+                id="booking-barbero"
                 value={form.barbero}
                 onChange={(e) => setForm({ ...form, barbero: e.target.value })}
               >
@@ -233,8 +241,9 @@ export default function Booking() {
 
             <div className="form-row">
               <div className="form-group">
-                <label>Fecha *</label>
+                <label htmlFor="booking-fecha">Fecha *</label>
                 <DatePicker
+                  id="booking-fecha"
                   selected={fecha}
                   onChange={setFecha}
                   filterDate={(d) => !isDisabled(d)}
@@ -247,12 +256,14 @@ export default function Booking() {
               </div>
 
               <div className="form-group">
-                <label>Hora *</label>
+                <label htmlFor="booking-hora">Hora *</label>
                 <select
+                  id="booking-hora"
                   value={hora}
                   onChange={(e) => setHora(e.target.value)}
                   required
                   disabled={!fecha || cargandoSlots}
+                  aria-busy={cargandoSlots}
                 >
                   <option value="">
                     {cargandoSlots
@@ -271,7 +282,7 @@ export default function Booking() {
                   })}
                 </select>
                 {fecha && !cargandoSlots && slotsOcupados.size > 0 && (
-                  <p className="slots-hint">
+                  <p className="slots-hint" aria-live="polite">
                     {slotsLibres === 0
                       ? "Sin huecos disponibles este día"
                       : `${slotsOcupados.size} ${
@@ -283,8 +294,9 @@ export default function Booking() {
             </div>
 
             <div className="form-group">
-              <label>Notas (opcional)</label>
+              <label htmlFor="booking-notas">Notas (opcional)</label>
               <textarea
+                id="booking-notas"
                 placeholder="Cuéntanos algo sobre lo que quieres…"
                 value={form.notas}
                 onChange={(e) => setForm({ ...form, notas: e.target.value })}

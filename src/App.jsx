@@ -29,8 +29,9 @@ export default function App() {
           success: { iconTheme: { primary: "#CC2020", secondary: "#fff" } },
         }}
       />
+      <a href="#main-content" className="skip-link">Saltar al contenido</a>
       <Navbar />
-      <main>
+      <main id="main-content">
         <ErrorBoundary>
           <Suspense fallback={<PageLoader />}>
             <Routes>

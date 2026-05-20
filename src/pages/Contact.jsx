@@ -52,7 +52,7 @@ export default function Contact() {
           <div className="contact-info">
 
             <div className="contact-info__block">
-              <FaMapMarkerAlt />
+              <FaMapMarkerAlt aria-hidden="true" />
               <div>
                 <h4>Ubicación</h4>
                 <p>C. de Pepe Isbert, 5<br />Cdad. Lineal, 28017 Madrid</p>
@@ -68,7 +68,7 @@ export default function Contact() {
             </div>
 
             <div className="contact-info__block">
-              <FaPhone />
+              <FaPhone aria-hidden="true" />
               <div>
                 <h4>Teléfono / WhatsApp</h4>
                 <a href="tel:+34632548698" className="contact-info__link">
@@ -81,7 +81,7 @@ export default function Contact() {
             </div>
 
             <div className="contact-info__block">
-              <FaClock />
+              <FaClock aria-hidden="true" />
               <div>
                 <h4>Horario</h4>
                 <p>Lun – Vie: 9:00 – 20:00</p>
@@ -131,45 +131,52 @@ export default function Contact() {
           </div>
 
           {/* ── Formulario ── */}
-          <form className="contact-form" onSubmit={handleSubmit}>
+          <form className="contact-form" onSubmit={handleSubmit} noValidate>
             <h3>Envíanos un mensaje</h3>
 
             <div className="form-row">
               <div className="form-group">
-                <label>Nombre *</label>
+                <label htmlFor="contact-nombre">Nombre *</label>
                 <input
+                  id="contact-nombre"
                   type="text"
                   placeholder="Tu nombre"
                   value={form.nombre}
                   onChange={(e) => setForm({ ...form, nombre: e.target.value })}
                   required
+                  autoComplete="name"
                 />
               </div>
               <div className="form-group">
-                <label>Email *</label>
+                <label htmlFor="contact-email">Email *</label>
                 <input
+                  id="contact-email"
                   type="email"
                   placeholder="tu@email.com"
                   value={form.email}
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   required
+                  autoComplete="email"
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label>Teléfono (opcional)</label>
+              <label htmlFor="contact-telefono">Teléfono (opcional)</label>
               <input
+                id="contact-telefono"
                 type="tel"
                 placeholder="+34 600 000 000"
                 value={form.telefono}
                 onChange={(e) => setForm({ ...form, telefono: e.target.value })}
+                autoComplete="tel"
               />
             </div>
 
             <div className="form-group">
-              <label>Asunto</label>
+              <label htmlFor="contact-asunto">Asunto</label>
               <input
+                id="contact-asunto"
                 type="text"
                 placeholder="¿En qué podemos ayudarte?"
                 value={form.asunto}
@@ -178,8 +185,9 @@ export default function Contact() {
             </div>
 
             <div className="form-group">
-              <label>Mensaje *</label>
+              <label htmlFor="contact-mensaje">Mensaje *</label>
               <textarea
+                id="contact-mensaje"
                 placeholder="Escribe tu mensaje aquí…"
                 value={form.mensaje}
                 onChange={(e) => setForm({ ...form, mensaje: e.target.value })}

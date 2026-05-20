@@ -4,7 +4,7 @@ import "./Footer.css";
 
 export default function Footer() {
   return (
-    <footer className="footer">
+    <footer className="footer" aria-label="Pie de página">
       <div className="container footer__grid">
 
         {/* Marca */}
@@ -44,18 +44,18 @@ export default function Footer() {
           <h4>Dónde estamos</h4>
           <ul className="footer__info">
             <li>
-              <FaMapMarkerAlt />
+              <FaMapMarkerAlt aria-hidden="true" />
               <a href="https://maps.app.goo.gl/8BysbHvzzH2kodWL7" target="_blank" rel="noreferrer">
                 C. de Pepe Isbert, 5<br />
                 Cdad. Lineal, 28017 Madrid
               </a>
             </li>
             <li>
-              <FaPhone />
+              <FaPhone aria-hidden="true" />
               <a href="tel:+34632548698">632 548 698</a>
             </li>
             <li>
-              <FaClock />
+              <FaClock aria-hidden="true" />
               <div>
                 <p>Lun – Vie: 9:00 – 20:00</p>
                 <p>Sábado: 9:00 – 18:00</p>

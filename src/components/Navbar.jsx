@@ -25,16 +25,19 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}>
+    <nav
+      className={`navbar ${scrolled ? "navbar--scrolled" : ""}`}
+      aria-label="Navegación principal"
+    >
       <div className="container navbar__inner">
 
         {/* Logo */}
-        <Link to="/" className="navbar__logo">
+        <Link to="/" className="navbar__logo" aria-label="Bulls Barber Shop — Inicio">
           BULLS <span>BARBER</span> SHOP
         </Link>
 
         {/* Links desktop */}
-        <ul className="navbar__links">
+        <ul className="navbar__links" role="list">
           {LINKS.map((link) => (
             <li key={link.to}>
               <NavLink
@@ -56,36 +59,45 @@ export default function Navbar() {
         </Link>
 
         {/* Hamburger */}
-        <button className="navbar__burger" onClick={() => setOpen(!open)} aria-label="Menú">
-          {open ? <FaTimes /> : <FaBars />}
+        <button
+          className="navbar__burger"
+          onClick={() => setOpen(!open)}
+          aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          aria-expanded={open}
+          aria-controls="mobile-menu"
+        >
+          {open ? <FaTimes aria-hidden="true" /> : <FaBars aria-hidden="true" />}
         </button>
       </div>
 
       {/* Menú móvil */}
-      {open && (
-        <div className="navbar__mobile">
-          <ul>
-            {LINKS.map((link) => (
-              <li key={link.to}>
-                <NavLink
-                  to={link.to}
-                  end={link.to === "/"}
-                  className={({ isActive }) =>
-                    isActive ? "navbar__link navbar__link--active" : "navbar__link"
-                  }
-                >
-                  {link.label}
-                </NavLink>
-              </li>
-            ))}
-            <li>
-              <Link to="/reservar" className="btn btn-gold" style={{ width: "100%", justifyContent: "center" }}>
-                Reservar cita
-              </Link>
+      <div
+        id="mobile-menu"
+        className="navbar__mobile"
+        aria-hidden={!open}
+        style={{ display: open ? undefined : "none" }}
+      >
+        <ul role="list">
+          {LINKS.map((link) => (
+            <li key={link.to}>
+              <NavLink
+                to={link.to}
+                end={link.to === "/"}
+                className={({ isActive }) =>
+                  isActive ? "navbar__link navbar__link--active" : "navbar__link"
+                }
+              >
+                {link.label}
+              </NavLink>
             </li>
-          </ul>
-        </div>
-      )}
+          ))}
+          <li>
+            <Link to="/reservar" className="btn btn-gold" style={{ width: "100%", justifyContent: "center" }}>
+              Reservar cita
+            </Link>
+          </li>
+        </ul>
+      </div>
     </nav>
   );
 }

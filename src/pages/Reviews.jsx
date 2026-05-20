@@ -71,26 +71,34 @@ export default function Reviews() {
           {/* Formulario nueva reseña */}
           <div className="review-form-wrap">
             <h3>Deja tu reseña</h3>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
               <div className="form-group">
-                <label>Tu nombre</label>
+                <label htmlFor="review-nombre">Tu nombre</label>
                 <input
+                  id="review-nombre"
                   type="text"
                   placeholder="Nombre o alias"
                   value={form.nombre}
                   onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                  autoComplete="nickname"
                 />
               </div>
 
               <div className="form-group">
-                <label>Valoración</label>
-                <div className="star-selector">
+                <label id="review-stars-label">Valoración</label>
+                <div
+                  className="star-selector"
+                  role="group"
+                  aria-labelledby="review-stars-label"
+                >
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button
                       type="button"
                       key={n}
                       className={`star-btn ${n <= form.valoracion ? "star-btn--active" : ""}`}
                       onClick={() => setForm({ ...form, valoracion: n })}
+                      aria-label={`${n} ${n === 1 ? "estrella" : "estrellas"}`}
+                      aria-pressed={n === form.valoracion}
                     >
                       ★
                     </button>
@@ -99,8 +107,9 @@ export default function Reviews() {
               </div>
 
               <div className="form-group">
-                <label>Comentario (opcional)</label>
+                <label htmlFor="review-comentario">Comentario (opcional)</label>
                 <textarea
+                  id="review-comentario"
                   placeholder="Cuéntanos tu experiencia…"
                   value={form.comentario}
                   onChange={(e) => setForm({ ...form, comentario: e.target.value })}
