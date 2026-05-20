@@ -27,6 +27,13 @@ input, textarea, select { font-family: inherit; }
 }
 .section { padding: var(--section-py) 0; }
 
+/* Cabecera de página interior — compensa la navbar fija (~70 px) */
+.page-header {
+  padding: 9rem 0 3.5rem;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+
 /* ── Tipografía de sección ───────────────────────────────────────────────── */
 .section-label {
   display: block;
