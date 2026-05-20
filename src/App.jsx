@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import WhatsAppButton from "./components/WhatsAppButton";
 import PageLoader from "./components/PageLoader";
+import ErrorBoundary from "./components/ErrorBoundary";
 
 const Home     = lazy(() => import("./pages/Home"));
 const Services = lazy(() => import("./pages/Services"));
@@ -30,17 +31,19 @@ export default function App() {
       />
       <Navbar />
       <main>
-        <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/"          element={<Home />}     />
-            <Route path="/servicios" element={<Services />} />
-            <Route path="/galeria"   element={<Gallery />}  />
-            <Route path="/resenas"   element={<Reviews />}  />
-            <Route path="/reservar"  element={<Booking />}  />
-            <Route path="/contacto"  element={<Contact />}  />
-            <Route path="*"          element={<NotFound />} />
-          </Routes>
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/"          element={<Home />}     />
+              <Route path="/servicios" element={<Services />} />
+              <Route path="/galeria"   element={<Gallery />}  />
+              <Route path="/resenas"   element={<Reviews />}  />
+              <Route path="/reservar"  element={<Booking />}  />
+              <Route path="/contacto"  element={<Contact />}  />
+              <Route path="*"          element={<NotFound />} />
+            </Routes>
+          </Suspense>
+        </ErrorBoundary>
       </main>
       <Footer />
       <WhatsAppButton />
