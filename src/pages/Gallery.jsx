@@ -19,9 +19,9 @@ const PLACEHOLDER = Array.from({ length: 9 }, (_, i) => ({
 export default function Gallery() {
   const [categoria, setCategoria] = useState("todas");
   const [selected, setSelected] = useState(null);
-  const { data: images } = useApi(() => getGallery(), []);
+  const { data: galleryData } = useApi(() => getGallery(), []);
 
-  const lista = images ?? PLACEHOLDER;
+  const lista = galleryData?.items ?? PLACEHOLDER;
   const filtradas =
     categoria === "todas" ? lista : lista.filter((img) => img.categoria === categoria);
 

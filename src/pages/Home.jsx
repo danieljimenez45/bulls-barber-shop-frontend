@@ -27,11 +27,11 @@ const REVIEWS_PLACEHOLDER = [
 ];
 
 export default function Home() {
-  const { data: services } = useApi(() => getServices(), []);
-  const { data: reviews }  = useApi(() => getReviews(),  []);
+  const { data: services }     = useApi(() => getServices(), []);
+  const { data: reviewsData }  = useApi(() => getReviews(),  []);
 
-  const featuredServices = services?.slice(0, 3) ?? SERVICES_PLACEHOLDER;
-  const featuredReviews  = reviews?.slice(0, 3)  ?? REVIEWS_PLACEHOLDER;
+  const featuredServices = services?.slice(0, 3)                ?? SERVICES_PLACEHOLDER;
+  const featuredReviews  = reviewsData?.items?.slice(0, 3)      ?? REVIEWS_PLACEHOLDER;
 
   return (
     <>

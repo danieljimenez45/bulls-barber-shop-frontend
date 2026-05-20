@@ -8,7 +8,8 @@ import ReviewCard from "../components/ReviewCard";
 import "./Reviews.css";
 
 export default function Reviews() {
-  const { data: reviews, loading } = useApi(() => getReviews(), []);
+  const { data: reviewsData, loading } = useApi(() => getReviews(), []);
+  const reviews = reviewsData?.items ?? null;
   const [form, setForm] = useState({ nombre: "", valoracion: 5, comentario: "" });
   const [enviando, setEnviando] = useState(false);
 
