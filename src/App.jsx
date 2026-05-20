@@ -9,6 +9,7 @@ import Gallery from "./pages/Gallery";
 import Reviews from "./pages/Reviews";
 import Booking from "./pages/Booking";
 import Contact from "./pages/Contact";
+import NotFound from "./pages/NotFound";
 
 export default function App() {
   return (
@@ -33,6 +34,7 @@ export default function App() {
           <Route path="/resenas"   element={<Reviews />}  />
           <Route path="/reservar"  element={<Booking />}  />
           <Route path="/contacto"  element={<Contact />}  />
+          <Route path="*"          element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
