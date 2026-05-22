@@ -24,6 +24,7 @@ const AdminDashboard   = lazy(() => import("./pages/admin/AdminDashboard"));
 const AdminReservas    = lazy(() => import("./pages/admin/AdminReservas"));
 const AdminResenas     = lazy(() => import("./pages/admin/AdminResenas"));
 const AdminServicios   = lazy(() => import("./pages/admin/AdminServicios"));
+const AdminGaleria     = lazy(() => import("./pages/admin/AdminGaleria"));
 const ProtectedRoute   = lazy(() => import("./components/admin/ProtectedRoute"));
 
 // ── Layout público (con Navbar + Footer) ─────────────────────────────────────
@@ -91,7 +92,7 @@ export default function App() {
                 <Route path="reservas"   element={<AdminReservas />}   />
                 <Route path="resenas"    element={<AdminResenas />}    />
                 <Route path="servicios"  element={<AdminServicios />}  />
-                {/* A-12: galería — siguiente tarea */}
+                <Route path="galeria"    element={<AdminGaleria />}    />
               </Route>
             </Route>
           </Routes>
