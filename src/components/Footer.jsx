@@ -70,6 +70,9 @@ export default function Footer() {
       <div className="footer__bottom container">
         <p>© {new Date().getFullYear()} Bulls Barber Shop · C. de Pepe Isbert 5, Ciudad Lineal, Madrid</p>
         <p>Solo cita previa · 632 548 698</p>
+        <Link to="/admin/login" className="footer__admin-link" aria-label="Acceso administración">
+          🔒
+        </Link>
       </div>
     </footer>
   );

@@ -23,7 +23,7 @@ adminApi.interceptors.request.use((config) => {
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
-/** Inicia sesión y devuelve el token JWT. */
+/** Inicia sesión y devuelve el token JWT (OAuth2 form — application/x-www-form-urlencoded). */
 export const loginAdmin = ({ email, password }) =>
   adminApi.post(
     "/auth/login",
