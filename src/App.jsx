@@ -18,9 +18,11 @@ const Contact  = lazy(() => import("./pages/Contact"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 // ── Panel de administración (lazy) ────────────────────────────────────────────
-const AdminLogin    = lazy(() => import("./pages/admin/AdminLogin"));
-const AdminLayout   = lazy(() => import("./pages/admin/AdminLayout"));
-const AdminReservas = lazy(() => import("./pages/admin/AdminReservas"));
+const AdminLogin       = lazy(() => import("./pages/admin/AdminLogin"));
+const AdminLayout      = lazy(() => import("./pages/admin/AdminLayout"));
+const AdminDashboard   = lazy(() => import("./pages/admin/AdminDashboard"));
+const AdminReservas    = lazy(() => import("./pages/admin/AdminReservas"));
+const ProtectedRoute   = lazy(() => import("./components/admin/ProtectedRoute"));
 
 // ── Layout público (con Navbar + Footer) ─────────────────────────────────────
 function PublicLayout({ children }) {
@@ -79,10 +81,14 @@ export default function App() {
 
             {/* ── Panel de administración (sin Navbar/Footer público) ─────── */}
             <Route path="/admin/login" element={<AdminLogin />} />
-            <Route path="/admin" element={<AdminLayout />}>
-              <Route index element={<Navigate to="/admin/reservas" replace />} />
-              <Route path="reservas" element={<AdminReservas />} />
-              {/* Próximas rutas admin (B-22…): servicios, reseñas, galería, stats */}
+
+            {/* Rutas protegidas: ProtectedRoute redirige a /login si no hay sesión */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<AdminDashboard />} />
+                <Route path="reservas"  element={<AdminReservas />} />
+                {/* A-10: reseñas, A-11: servicios, A-12: galería — siguientes tareas */}
+              </Route>
             </Route>
           </Routes>
         </Suspense>
