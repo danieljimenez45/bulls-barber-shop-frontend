@@ -76,16 +76,29 @@ export const exportBookingsCSV = async (desde, hasta) => {
 
 // ── Servicios (admin) ─────────────────────────────────────────────────────────
 
-export const listAdminServices = () => adminApi.get("/services", { params: { include_inactive: true } });
-export const createService = (data) => adminApi.post("/services", data);
-export const updateService = (id, data) => adminApi.patch(`/services/${id}`, data);
-export const deleteService = (id) => adminApi.delete(`/services/${id}`);
+/** Lista todos los servicios (incluidos los inactivos) para el panel admin. */
+export const listAdminServices = () =>
+  adminApi.get("/services", { params: { solo_activos: false } });
+
+export const createService  = (data)      => adminApi.post(`/services`, data);
+/** El backend expone PUT (reemplazo completo con campos opcionales vía ServiceUpdate). */
+export const updateService  = (id, data)  => adminApi.put(`/services/${id}`, data);
+export const deleteService  = (id)        => adminApi.delete(`/services/${id}`);
 
 // ── Reseñas (admin) ───────────────────────────────────────────────────────────
 
-export const listAdminReviews = ({ page = 1, size = 20 } = {}) =>
-  adminApi.get("/reviews", { params: { page, size } });
-export const toggleReviewVisibility = (id) => adminApi.patch(`/reviews/${id}/visibilidad`);
+/** Lista reseñas paginadas sin filtro de visibilidad (el admin las ve todas). */
+export const listAdminReviews = ({ page = 1, size = 50 } = {}) =>
+  adminApi.get("/reviews", { params: { page, size, solo_visibles: false } });
+
+/**
+ * Cambia la visibilidad de una reseña.
+ * @param {number} id
+ * @param {boolean} visible - nuevo estado deseado
+ */
+export const toggleReviewVisibility = (id, visible) =>
+  adminApi.patch(`/reviews/${id}/visibilidad`, null, { params: { visible } });
+
 export const deleteReview = (id) => adminApi.delete(`/reviews/${id}`);
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
