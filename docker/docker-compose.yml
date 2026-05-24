@@ -1,0 +1,41 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# frontend/docker/docker-compose.yml
+#
+# Despliega únicamente el servicio del frontend (React compilado con `serve`).
+# El backend es un repositorio independiente con su propio compose.
+#
+# VITE_API_URL: URL pública del backend tal como la ve el navegador del usuario.
+#   - En local:           http://localhost:8000
+#   - En servidor remoto: http://<ip-o-dominio>:8000
+#   - Con nginx (futuro): se elimina esta variable y el proxy maneja /api
+#
+# Uso (desde la raíz del repo frontend/):
+#   VITE_API_URL=http://localhost:8000 docker compose -f docker/docker-compose.yml up --build -d
+#
+# O crea un fichero .env en frontend/ con:
+#   VITE_API_URL=http://localhost:8000
+# y luego:
+#   docker compose -f docker/docker-compose.yml up --build -d
+#
+# Otros comandos:
+#   docker compose -f docker/docker-compose.yml logs -f
+#   docker compose -f docker/docker-compose.yml down
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  frontend:
+    build:
+      # Contexto: raíz del repo frontend/ (un nivel arriba de docker/)
+      context: ..
+      dockerfile: docker/Dockerfile
+      args:
+        # Se incrusta en el bundle durante el build de Vite.
+        # Si cambias la URL del backend debes reconstruir la imagen.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    container_name: bulls_frontend
+    restart: unless-stopped
+
+    ports:
+      # Cambia el puerto host si el 3000 está ocupado: "8080:3000"
+      - "3000:3000"

@@ -1,0 +1,36 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# frontend/docker/docker-compose.prod.yml — Entorno de producción
+#
+# - Bundle compilado con Vite (estáticos optimizados)
+# - Servido con `serve` (ligero, sin Node en runtime)
+# - VITE_API_URL incrustada en el bundle durante el build
+#
+# VITE_API_URL: URL pública del backend tal como la ve el navegador.
+#   Local:    http://localhost:8000
+#   Servidor: http://<ip-o-dominio>:8000
+#   Con nginx (futuro): se elimina esta variable
+#
+# Uso (desde la raíz del repo frontend/):
+#   VITE_API_URL=http://tuservidor:8000 \
+#   docker compose -f docker/docker-compose.prod.yml up --build -d
+#
+# O define VITE_API_URL en un fichero .env en frontend/ y ejecuta:
+#   docker compose -f docker/docker-compose.prod.yml up --build -d
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: prod          # usa el stage "prod" del Dockerfile
+      args:
+        # Se incrusta en el bundle durante el build.
+        # Si cambias la URL del backend debes reconstruir la imagen.
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
+    container_name: bulls_frontend
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"

@@ -1,0 +1,41 @@
+# ──────────────────────────────────────────────────────────────────────────────
+# frontend/docker/docker-compose.dev.yml — Entorno de desarrollo
+#
+# - Vite dev server con hot reload (HMR)
+# - Código montado como volumen: los cambios se reflejan al instante
+# - Sin VITE_API_URL: el proxy de Vite redirige /api al backend
+#   (vite.config.js → server.proxy → http://host.docker.internal:8000)
+# - node_modules se preserva en un volumen anónimo para no pisar
+#   los del contenedor con los del host (evita conflictos de plataforma)
+#
+# Requisito: el backend debe estar corriendo en el puerto 8000 del host.
+#
+# Uso (desde la raíz del repo frontend/):
+#   docker compose -f docker/docker-compose.dev.yml up --build
+# ──────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+      target: dev           # usa el stage "dev" del Dockerfile
+    container_name: bulls_frontend_dev
+    restart: "no"
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      # Código fuente montado: HMR funciona sin rebuild
+      - ..:/app
+      # Volumen anónimo: preserva los node_modules del contenedor
+      # (evita que el mount anterior los sobreescriba con los del host)
+      - /app/node_modules
+
+    environment:
+      # Necesario para que Vite HMR funcione dentro del contenedor
+      - CHOKIDAR_USEPOLLING=true
+      # Apunta el proxy de Vite al backend corriendo en el host
+      - VITE_BACKEND_HOST=host.docker.internal
