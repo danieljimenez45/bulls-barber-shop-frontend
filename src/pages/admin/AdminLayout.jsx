@@ -25,11 +25,12 @@ import toast from "react-hot-toast";
  * en móvil se muestran como tabs en la bottom navigation.
  */
 const NAV_ITEMS = [
-  { to: "/admin",          label: "Inicio",    icon: "📊", end: true  },
-  { to: "/admin/reservas", label: "Reservas",  icon: "📅", end: false },
-  { to: "/admin/servicios",label: "Servicios", icon: "✂️",  end: false },
-  { to: "/admin/resenas",  label: "Reseñas",   icon: "⭐", end: false },
-  { to: "/admin/galeria",  label: "Galería",   icon: "🖼️",  end: false },
+  { to: "/admin",           label: "Inicio",    icon: "📊", end: true  },
+  { to: "/admin/reservas",  label: "Reservas",  icon: "📅", end: false },
+  { to: "/admin/servicios", label: "Servicios", icon: "✂️",  end: false },
+  { to: "/admin/resenas",   label: "Reseñas",   icon: "⭐", end: false },
+  { to: "/admin/galeria",   label: "Galería",   icon: "🖼️",  end: false },
+  { to: "/admin/mensajes",  label: "Mensajes",  icon: "✉️",  end: false },
 ];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

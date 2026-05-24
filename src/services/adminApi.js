@@ -2,6 +2,11 @@
  * adminApi.js
  * Cliente Axios para endpoints de administración que requieren JWT.
  * El token se almacena en localStorage bajo la clave "bulls_admin_token".
+ *
+ * IMPORTANTE: todos los paths de colección llevan barra final ("/bookings/")
+ * para evitar que FastAPI haga un 307 redirect a la URL con barra, ya que
+ * los clientes HTTP descartan el header Authorization al seguir redirects,
+ * lo que provoca un 401 en endpoints protegidos.
  */
 
 import axios from "axios";
@@ -35,24 +40,21 @@ export const loginAdmin = ({ email, password }) =>
 
 /** Lista reservas paginadas con filtro opcional de estado. */
 export const listBookings = ({ page = 1, size = 20, estado } = {}) =>
-  adminApi.get("/bookings", { params: { page, size, estado } });
+  adminApi.get("/bookings/", { params: { page, size, estado } });
 
 /** Actualiza el estado / notas / barbero de una reserva. */
 export const updateBooking = (id, data) => adminApi.patch(`/bookings/${id}`, data);
 
-/** Cancela (soft-delete) una reserva. */
+/** Soft-delete de una reserva (fija deleted_at). */
 export const cancelBooking = (id) => adminApi.delete(`/bookings/${id}`);
 
 /**
  * Dispara la descarga del CSV de reservas en un rango de fechas.
- * Crea dinámicamente un <a> y lo pulsa para que el navegador lo descargue.
- *
- * @param {string} desde - Fecha inicio en formato YYYY-MM-DD
- * @param {string} hasta - Fecha fin en formato YYYY-MM-DD
+ * Usa fetch nativo para manejar la respuesta como Blob.
  */
 export const exportBookingsCSV = async (desde, hasta) => {
   const token = localStorage.getItem("bulls_admin_token");
-  const url = `/api/bookings/export?desde=${desde}&hasta=${hasta}`;
+  const url   = `/api/bookings/export?desde=${desde}&hasta=${hasta}`;
 
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -63,10 +65,10 @@ export const exportBookingsCSV = async (desde, hasta) => {
     throw new Error(text || `Error ${response.status}`);
   }
 
-  const blob = await response.blob();
+  const blob      = await response.blob();
   const objectUrl = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = objectUrl;
+  const anchor    = document.createElement("a");
+  anchor.href     = objectUrl;
   anchor.download = `reservas_${desde}_${hasta}.csv`;
   document.body.appendChild(anchor);
   anchor.click();
@@ -78,18 +80,18 @@ export const exportBookingsCSV = async (desde, hasta) => {
 
 /** Lista todos los servicios (incluidos los inactivos) para el panel admin. */
 export const listAdminServices = () =>
-  adminApi.get("/services", { params: { solo_activos: false } });
+  adminApi.get("/services/", { params: { solo_activos: false } });
 
-export const createService  = (data)      => adminApi.post(`/services`, data);
+export const createService = (data)     => adminApi.post("/services/", data);
 /** El backend expone PUT (reemplazo completo con campos opcionales vía ServiceUpdate). */
-export const updateService  = (id, data)  => adminApi.put(`/services/${id}`, data);
-export const deleteService  = (id)        => adminApi.delete(`/services/${id}`);
+export const updateService = (id, data) => adminApi.put(`/services/${id}`, data);
+export const deleteService = (id)       => adminApi.delete(`/services/${id}`);
 
 // ── Reseñas (admin) ───────────────────────────────────────────────────────────
 
 /** Lista reseñas paginadas sin filtro de visibilidad (el admin las ve todas). */
 export const listAdminReviews = ({ page = 1, size = 50 } = {}) =>
-  adminApi.get("/reviews", { params: { page, size, solo_visibles: false } });
+  adminApi.get("/reviews/", { params: { page, size, solo_visibles: false } });
 
 /**
  * Cambia la visibilidad de una reseña.
@@ -105,7 +107,7 @@ export const deleteReview = (id) => adminApi.delete(`/reviews/${id}`);
 
 /** Lista imágenes de la galería (todas, sin filtro de visibilidad). */
 export const listGallery = ({ categoria, page = 1, size = 100 } = {}) =>
-  adminApi.get("/gallery", { params: { ...(categoria && { categoria }), page, size } });
+  adminApi.get("/gallery/", { params: { ...(categoria && { categoria }), page, size } });
 
 /** Elimina una imagen de la galería por ID. */
 export const deleteGalleryImage = (id) => adminApi.delete(`/gallery/${id}`);
@@ -147,6 +149,18 @@ export const uploadGalleryImage = (formData, onProgress) =>
     xhr.onerror = () => reject(new Error("Error de red al subir la imagen"));
     xhr.send(formData);
   });
+
+// ── Mensajes de contacto (admin) ─────────────────────────────────────────────
+
+/**
+ * Lista mensajes de contacto paginados.
+ * @param {{ page?, size?, solo_no_leidos? }} opts
+ */
+export const listContactMessages = ({ page = 1, size = 50, solo_no_leidos = false } = {}) =>
+  adminApi.get("/contact/", { params: { page, size, solo_no_leidos } });
+
+/** Marca un mensaje como leído. */
+export const markMessageRead = (id) => adminApi.patch(`/contact/${id}/leido`);
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
 
