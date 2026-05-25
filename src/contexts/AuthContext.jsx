@@ -114,7 +114,11 @@ export function AuthProvider({ children }) {
   // Cargamos el token inicial solo si sigue siendo válido
   const [token, setToken] = useState(() => {
     const stored = localStorage.getItem(TOKEN_KEY);
-    return isTokenValid(stored) ? stored : null;
+    if (!isTokenValid(stored)) {
+      if (stored) localStorage.removeItem(TOKEN_KEY);
+      return null;
+    }
+    return stored;
   });
 
   // Ref para el timer de auto-logout (evita memory leaks al desmontar)

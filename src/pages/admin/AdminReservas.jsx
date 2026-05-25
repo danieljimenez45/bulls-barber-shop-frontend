@@ -149,7 +149,7 @@ function CancelModal({ booking, onConfirm, onClose, loading }) {
  * Tarjeta de reserva para móvil.
  * Muestra todos los datos y los botones de acción.
  */
-function BookingCard({ booking, onEstadoChange, onCancelRequest, updating }) {
+function BookingCard({ booking, onEstadoChange, updating }) {
   const isBusy = updating === booking.id;
 
   return (
@@ -216,7 +216,7 @@ function BookingCard({ booking, onEstadoChange, onCancelRequest, updating }) {
           )}
           <button
             className="ar-btn ar-btn--cancel"
-            onClick={() => onCancelRequest(booking)}
+            onClick={() => onEstadoChange(booking, "cancelada")}
             disabled={isBusy}
           >
             ✕ Cancelar
@@ -501,7 +501,6 @@ export default function AdminReservas() {
               key={b.id}
               booking={b}
               onEstadoChange={handleEstadoChange}
-              onCancelRequest={setCancelTarget}
               updating={updatingId}
             />
           ))}
