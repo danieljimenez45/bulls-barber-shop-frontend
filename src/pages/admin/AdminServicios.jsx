@@ -21,7 +21,7 @@ import {
   createService,
   updateService,
   deleteService,
-} from "../../services/adminApi";
+} from "../../api/services";
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 

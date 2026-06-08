@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { FaMapMarkerAlt, FaPhone, FaClock, FaInstagram, FaTiktok, FaWhatsapp } from "react-icons/fa";
-import { sendContact } from "../services/api";
+import { sendContact } from "../api/contact";
 import SeoHead from "../components/SeoHead";
 import "./Contact.css";
 

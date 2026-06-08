@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useApi } from "../hooks/useApi";
-import { getServices } from "../services/api";
+import { getServices } from "../api/services";
 import SeoHead from "../components/SeoHead";
 import ServiceCard from "../components/ServiceCard";
 import "./Services.css";

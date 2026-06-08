@@ -53,26 +53,14 @@ vi.mock("axios", () => {
   };
 });
 
-import {
-  loginAdmin,
-  listBookings,
-  updateBooking,
-  cancelBooking,
-  exportBookingsCSV,
-  listAdminServices,
-  createService,
-  updateService,
-  deleteService,
-  listAdminReviews,
-  toggleReviewVisibility,
-  deleteReview,
-  listGallery,
-  deleteGalleryImage,
-  listContactMessages,
-  markMessageRead,
-  getStats,
-  uploadGalleryImage,
-} from "../../services/adminApi";
+// Importar desde los nuevos módulos de dominio
+import { loginAdmin }                                     from "../../api/auth";
+import { listBookings, updateBooking, cancelBooking, exportBookingsCSV } from "../../api/bookings";
+import { listAdminServices, createService, updateService, deleteService } from "../../api/services";
+import { listAdminReviews, toggleReviewVisibility, deleteReview }         from "../../api/reviews";
+import { listGallery, deleteGalleryImage, uploadGalleryImage }            from "../../api/gallery";
+import { listContactMessages, markMessageRead }                           from "../../api/contact";
+import { getStats }                                                       from "../../api/stats";
 
 // ─────────────────────────────────────────────────────────────────────────────
 

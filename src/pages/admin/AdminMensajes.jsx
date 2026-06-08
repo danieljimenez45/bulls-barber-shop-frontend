@@ -17,7 +17,7 @@
 
 import { useEffect, useState, useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
-import { listContactMessages, markMessageRead } from "../../services/adminApi";
+import { listContactMessages, markMessageRead } from "../../api/contact";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

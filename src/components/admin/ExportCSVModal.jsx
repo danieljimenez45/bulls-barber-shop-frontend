@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useRef } from "react";
-import { exportBookingsCSV } from "../../services/adminApi";
+import { exportBookingsCSV } from "../../api/bookings";
 import toast from "react-hot-toast";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

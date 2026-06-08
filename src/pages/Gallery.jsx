@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes } from "react-icons/fa";
 import { useApi } from "../hooks/useApi";
-import { getGallery } from "../services/api";
+import { getGallery } from "../api/gallery";
 import SeoHead from "../components/SeoHead";
 import "./Gallery.css";
 

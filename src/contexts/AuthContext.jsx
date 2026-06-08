@@ -24,7 +24,7 @@ import {
   useState,
 } from "react";
 
-import { loginAdmin } from "../services/adminApi";
+import { loginAdmin } from "../api/auth";
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 

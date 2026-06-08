@@ -18,7 +18,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
-import { listBookings, updateBooking, cancelBooking } from "../../services/adminApi";
+import { listBookings, updateBooking, cancelBooking } from "../../api/bookings";
 import ExportCSVModal from "../../components/admin/ExportCSVModal";
 
 // ── Constantes ────────────────────────────────────────────────────────────────

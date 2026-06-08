@@ -19,7 +19,7 @@ import {
   listAdminReviews,
   toggleReviewVisibility,
   deleteReview,
-} from "../../services/adminApi";
+} from "../../api/reviews";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

@@ -19,7 +19,7 @@
  */
 
 import { useEffect, useState, useCallback } from "react";
-import { getStats } from "../../services/adminApi";
+import { getStats } from "../../api/stats";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 

@@ -21,7 +21,7 @@ import {
   listGallery,
   uploadGalleryImage,
   deleteGalleryImage,
-} from "../../services/adminApi";
+} from "../../api/gallery";
 
 // ── Constantes ────────────────────────────────────────────────────────────────
 

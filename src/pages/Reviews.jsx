@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { useApi } from "../hooks/useApi";
-import { getReviews, createReview } from "../services/api";
+import { getReviews, createReview } from "../api/reviews";
 import SeoHead from "../components/SeoHead";
 import ReviewCard from "../components/ReviewCard";
 import "./Reviews.css";

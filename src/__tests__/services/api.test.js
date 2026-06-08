@@ -34,16 +34,12 @@ vi.mock("axios", () => {
   };
 });
 
-// Importar DESPUÉS del mock
-import {
-  getServices,
-  createBooking,
-  getDisponibilidad,
-  getReviews,
-  createReview,
-  getGallery,
-  sendContact,
-} from "../../services/api";
+// Importar DESPUÉS del mock (desde los nuevos módulos de dominio)
+import { createBooking, getDisponibilidad } from "../../api/bookings";
+import { getServices }                       from "../../api/services";
+import { getReviews, createReview }          from "../../api/reviews";
+import { getGallery }                        from "../../api/gallery";
+import { sendContact }                       from "../../api/contact";
 
 // ─────────────────────────────────────────────────────────────────────────────
 
