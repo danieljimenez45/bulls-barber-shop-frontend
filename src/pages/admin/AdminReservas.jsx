@@ -534,7 +534,7 @@ export default function AdminReservas() {
           >← Anterior</button>
           <span className="ar-page-info">
             {page} / {totalPages}
-            <span className="ar-page-sub"> ({filtered.length} reservas)</span>
+            <span className="ar-page-sub"> ({total} reservas)</span>
           </span>
           <button
             className="ar-btn ar-btn--page"

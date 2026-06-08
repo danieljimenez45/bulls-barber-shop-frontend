@@ -71,9 +71,25 @@ const RESERVAS = [
   makeBooking({ id: 3, nombre_cliente: "Carlos Ruiz",  telefono: "611223344", estado: "completada" }),
 ];
 
-function mockListBookingsSuccess(items = RESERVAS) {
-  mockListBookings.mockResolvedValue({
-    data: { items, total: items.length, page: 1, size: 200 },
+/**
+ * Mock inteligente de listBookings.
+ *
+ * El componente hace múltiples llamadas con params distintos:
+ *   - page fetch  → { page, size: PAGE_SIZE (15), estado? }
+ *   - count calls → { page: 1, size: 1, estado? }  (×5 en el mount)
+ *
+ * Esta implementación maneja todos los casos automáticamente:
+ *   - Filtra por `estado` si se proporciona
+ *   - Pagina según `page` y `size`
+ */
+function mockListBookingsImpl(items = RESERVAS) {
+  mockListBookings.mockImplementation(({ page = 1, size = 15, estado } = {}) => {
+    const filtered = estado ? items.filter((b) => b.estado === estado) : items;
+    const offset   = (page - 1) * size;
+    const pageItems = filtered.slice(offset, offset + size);
+    return Promise.resolve({
+      data: { items: pageItems, total: filtered.length, page, size },
+    });
   });
 }
 
@@ -116,7 +132,7 @@ describe("AdminReservas", () => {
   // ── Carga inicial ───────────────────────────────────────────────────────────
 
   it("muestra las reservas cargadas del backend", async () => {
-    mockListBookingsSuccess();
+    mockListBookingsImpl();
     render(<AdminReservas />);
 
     await waitFor(() => {
@@ -126,13 +142,21 @@ describe("AdminReservas", () => {
     expect(desktopTable().getByText("Carlos Ruiz")).toBeInTheDocument();
   });
 
-  it("llama a listBookings con page=1 y size grande al montar", async () => {
-    mockListBookingsSuccess();
+  it("llama a listBookings para cargar página y conteos al montar", async () => {
+    mockListBookingsImpl();
     render(<AdminReservas />);
-    await waitFor(() => expect(mockListBookings).toHaveBeenCalledOnce());
-    const [args] = mockListBookings.mock.calls;
-    // El componente carga todas las reservas de una vez (size=200 o similar)
-    expect(args[0].page).toBe(1);
+
+    // 1 llamada de página (size=PAGE_SIZE) + 5 de conteo (size=1) = 6
+    await waitFor(() => expect(mockListBookings.mock.calls.length).toBeGreaterThanOrEqual(6));
+
+    const calls = mockListBookings.mock.calls.map((c) => c[0]);
+
+    // Debe haber exactamente una llamada de página con page=1 y size=15
+    expect(calls).toContainEqual(expect.objectContaining({ page: 1, size: 15 }));
+
+    // Deben haber al menos 5 llamadas de conteo con size=1
+    const countCalls = calls.filter((c) => c.size === 1);
+    expect(countCalls.length).toBeGreaterThanOrEqual(5);
   });
 
   it("muestra un indicador de carga mientras se cargan las reservas", () => {
@@ -144,7 +168,7 @@ describe("AdminReservas", () => {
   });
 
   it("muestra mensaje de vacío cuando no hay reservas", async () => {
-    mockListBookingsSuccess([]);
+    mockListBookingsImpl([]);
     render(<AdminReservas />);
     await waitFor(() => {
       expect(mockListBookings).toHaveBeenCalled();
@@ -157,7 +181,7 @@ describe("AdminReservas", () => {
   // ── Búsqueda client-side ────────────────────────────────────────────────────
 
   it("filtra reservas por nombre al escribir en el buscador", async () => {
-    mockListBookingsSuccess();
+    mockListBookingsImpl();
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -169,7 +193,7 @@ describe("AdminReservas", () => {
   });
 
   it("filtra reservas por teléfono al escribir en el buscador", async () => {
-    mockListBookingsSuccess();
+    mockListBookingsImpl();
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -183,7 +207,7 @@ describe("AdminReservas", () => {
   // ── Filtro por estado (chips) ───────────────────────────────────────────────
 
   it("filtra por estado al hacer clic en un chip", async () => {
-    mockListBookingsSuccess();
+    mockListBookingsImpl();
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -197,7 +221,7 @@ describe("AdminReservas", () => {
   });
 
   it("vuelve a mostrar todas las reservas al hacer clic en chip 'Todas'", async () => {
-    mockListBookingsSuccess();
+    mockListBookingsImpl();
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -216,7 +240,7 @@ describe("AdminReservas", () => {
   // ── Modal de cancelación ────────────────────────────────────────────────────
 
   it("abre el modal de cancelación al hacer clic en el botón cancelar", async () => {
-    mockListBookingsSuccess([makeBooking({ estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ estado: "pendiente" })]);
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -228,7 +252,7 @@ describe("AdminReservas", () => {
   });
 
   it("cierra el modal de cancelación al pulsar Escape", async () => {
-    mockListBookingsSuccess([makeBooking({ estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ estado: "pendiente" })]);
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -243,7 +267,7 @@ describe("AdminReservas", () => {
   });
 
   it("llama a cancelBooking() al confirmar la cancelación", async () => {
-    mockListBookingsSuccess([makeBooking({ id: 5, estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ id: 5, estado: "pendiente" })]);
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -270,7 +294,7 @@ describe("AdminReservas", () => {
         estado: "pendiente",
       })
     );
-    mockListBookingsSuccess(muchas);
+    mockListBookingsImpl(muchas);
     render(<AdminReservas />);
 
     await waitFor(() => desktopTable().getByText("Cliente 1"));
@@ -286,7 +310,7 @@ describe("AdminReservas", () => {
   });
 
   it("abre el modal de exportación CSV al hacer clic en el botón correspondiente", async () => {
-    mockListBookingsSuccess();
+    mockListBookingsImpl();
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -311,7 +335,7 @@ describe("AdminReservas", () => {
   });
 
   it("muestra toast si falla cancelBooking al confirmar el modal", async () => {
-    mockListBookingsSuccess([makeBooking({ id: 3, estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ id: 3, estado: "pendiente" })]);
     mockCancelBooking.mockRejectedValue(new Error("conflicto"));
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
@@ -330,7 +354,7 @@ describe("AdminReservas", () => {
   });
 
   it("muestra toast si falla updateBooking al confirmar desde la tabla", async () => {
-    mockListBookingsSuccess([makeBooking({ id: 1, estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ id: 1, estado: "pendiente" })]);
     mockUpdateBooking.mockRejectedValue(new Error("fallo"));
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
@@ -345,7 +369,7 @@ describe("AdminReservas", () => {
   });
 
   it("completa una reserva confirmada desde la tabla", async () => {
-    mockListBookingsSuccess([makeBooking({ id: 4, estado: "confirmada" })]);
+    mockListBookingsImpl([makeBooking({ id: 4, estado: "confirmada" })]);
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -359,7 +383,7 @@ describe("AdminReservas", () => {
   });
 
   it("confirma una reserva pendiente desde la tabla y muestra toast de éxito", async () => {
-    mockListBookingsSuccess([makeBooking({ id: 1, estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ id: 1, estado: "pendiente" })]);
     mockUpdateBooking.mockResolvedValue({
       data: makeBooking({ id: 1, estado: "confirmada" }),
     });
@@ -379,7 +403,7 @@ describe("AdminReservas", () => {
   });
 
   it("muestra mensaje de búsqueda sin resultados", async () => {
-    mockListBookingsSuccess();
+    mockListBookingsImpl();
     render(<AdminReservas />);
     await waitFor(() => desktopTable().getByText("Juan García"));
 
@@ -393,7 +417,7 @@ describe("AdminReservas", () => {
   // ── Vista móvil (BookingCard) ─────────────────────────────────────────────
 
   it("muestra barbero y notas en la card móvil", async () => {
-    mockListBookingsSuccess([
+    mockListBookingsImpl([
       makeBooking({
         barbero: "Barbero 1",
         notas: "Degradado bajo",
@@ -410,7 +434,7 @@ describe("AdminReservas", () => {
   });
 
   it("confirma una reserva desde la card móvil", async () => {
-    mockListBookingsSuccess([makeBooking({ id: 2, estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ id: 2, estado: "pendiente" })]);
     render(<AdminReservas />);
     await waitFor(() => mobileCards().getByText("Juan García"));
 
@@ -422,7 +446,7 @@ describe("AdminReservas", () => {
   });
 
   it("abre el modal de cancelación desde la card móvil", async () => {
-    mockListBookingsSuccess([makeBooking({ estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ estado: "pendiente" })]);
     render(<AdminReservas />);
     await waitFor(() => mobileCards().getByText("Juan García"));
 
@@ -434,7 +458,7 @@ describe("AdminReservas", () => {
   });
 
   it("completa una reserva confirmada desde la card móvil", async () => {
-    mockListBookingsSuccess([makeBooking({ id: 6, estado: "confirmada" })]);
+    mockListBookingsImpl([makeBooking({ id: 6, estado: "confirmada" })]);
     render(<AdminReservas />);
     await waitFor(() => mobileCards().getByText("Juan García"));
 
@@ -446,7 +470,7 @@ describe("AdminReservas", () => {
   });
 
   it("muestra toast si falla updateBooking desde la card móvil", async () => {
-    mockListBookingsSuccess([makeBooking({ id: 7, estado: "pendiente" })]);
+    mockListBookingsImpl([makeBooking({ id: 7, estado: "pendiente" })]);
     mockUpdateBooking.mockRejectedValue(new Error("fallo"));
     render(<AdminReservas />);
     await waitFor(() => mobileCards().getByText("Juan García"));

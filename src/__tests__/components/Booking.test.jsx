@@ -238,10 +238,12 @@ describe("Booking", () => {
           nombre_cliente: "Juan García",
           telefono: "612345678",
           servicio_id: 1,
-          servicio_nombre: "Corte Clásico",
-          fecha_hora: expect.stringMatching(/2026-06-10T\d{2}:00:00/),
+          // servicio_nombre ya no se envía — el backend lo obtiene de BD
+          fecha_hora: expect.stringMatching(/2026-06-10T09:00:00/),
         })
       );
+      // servicio_nombre NO debe estar en el payload (extra="forbid" en el backend)
+      expect(mockCreateBooking.mock.calls[0][0]).not.toHaveProperty("servicio_nombre");
       expect(mockToastSuccess).toHaveBeenCalledWith(
         expect.stringMatching(/reserva enviada/i)
       );

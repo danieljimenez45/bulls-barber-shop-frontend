@@ -25,7 +25,10 @@ vi.mock("axios", () => {
   const mockInstance = {
     get: mockGet,
     post: mockPost,
-    interceptors: { request: { use: vi.fn() } },
+    interceptors: {
+      request:  { use: vi.fn() },
+      response: { use: vi.fn() },   // necesario tras añadir el interceptor 401 en createClient
+    },
   };
   return {
     default: {

@@ -44,6 +44,7 @@ vi.mock("axios", () => {
           interceptorCallbackRef.current = cb;
         }),
       },
+      response: { use: vi.fn() },   // necesario tras añadir el interceptor 401 en createClient
     },
   };
   return {
