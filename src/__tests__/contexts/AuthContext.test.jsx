@@ -21,7 +21,7 @@ const { mockLoginAdmin } = vi.hoisted(() => ({
   mockLoginAdmin: vi.fn(),
 }));
 
-vi.mock("../../services/adminApi", () => ({
+vi.mock("../../api/auth", () => ({
   loginAdmin: (...args) => mockLoginAdmin(...args),
 }));
 

@@ -17,7 +17,7 @@ vi.mock("../../components/ServiceCard", () => ({
 
 const mockGetServices = vi.fn();
 
-vi.mock("../../services/api", () => ({
+vi.mock("../../api/services", () => ({
   getServices: (...args) => mockGetServices(...args),
 }));
 

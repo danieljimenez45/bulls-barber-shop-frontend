@@ -68,13 +68,15 @@ vi.mock("react-hot-toast", () => ({
 }));
 
 // ── Mock de api.js ────────────────────────────────────────────────────────────
-// Paths resueltos desde src/__tests__/components/ → src/services/api
 const mockGetServices       = vi.fn();
 const mockGetDisponibilidad = vi.fn();
 const mockCreateBooking     = vi.fn();
 
-vi.mock("../../services/api", () => ({
-  getServices:       (...args) => mockGetServices(...args),
+vi.mock("../../api/services", () => ({
+  getServices: (...args) => mockGetServices(...args),
+}));
+
+vi.mock("../../api/bookings", () => ({
   getDisponibilidad: (...args) => mockGetDisponibilidad(...args),
   createBooking:     (...args) => mockCreateBooking(...args),
 }));

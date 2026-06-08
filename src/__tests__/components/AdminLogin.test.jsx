@@ -35,7 +35,7 @@ vi.mock("react-hot-toast", () => ({
   default: { error: (...args) => mockToastError(...args) },
 }));
 
-vi.mock("../../services/adminApi", () => ({
+vi.mock("../../api/auth", () => ({
   loginAdmin: (...args) => mockLoginAdmin(...args),
 }));
 

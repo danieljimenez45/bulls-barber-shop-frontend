@@ -40,7 +40,7 @@ const mockListBookings  = vi.fn();
 const mockUpdateBooking = vi.fn();
 const mockCancelBooking = vi.fn();
 
-vi.mock("../../services/adminApi", () => ({
+vi.mock("../../api/bookings", () => ({
   listBookings:  (...args) => mockListBookings(...args),
   updateBooking: (...args) => mockUpdateBooking(...args),
   cancelBooking: (...args) => mockCancelBooking(...args),
