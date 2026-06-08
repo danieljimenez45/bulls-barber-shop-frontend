@@ -92,7 +92,7 @@ const MOCK_SERVICES = [
 ];
 
 const DISPONIBILIDAD_LIBRE = {
-  data: { slots_libres: ["09:00", "10:00"], slots_ocupados: [] },
+  data: { slots_libres: ["10:00", "10:30"], slots_ocupados: [] },
 };
 
 // ── Helper ────────────────────────────────────────────────────────────────────
@@ -118,7 +118,8 @@ async function fillBookingForm({ nombre = "Juan García", telefono = "612345678"
     target: { value: "2026-06-10" },
   });
   await waitFor(() => expect(mockGetDisponibilidad).toHaveBeenCalled());
-  await userEvent.selectOptions(screen.getByLabelText(/^hora/i), "09:00");
+  // La hora ya no es un <select> sino un botón de la rejilla
+  fireEvent.click(screen.getByRole("button", { name: "10:00" }));
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
@@ -188,7 +189,7 @@ describe("Booking", () => {
       target: { value: "2026-06-10" },
     });
     await waitFor(() => expect(mockGetDisponibilidad).toHaveBeenCalled());
-    await userEvent.selectOptions(screen.getByLabelText(/^hora/i), "09:00");
+    fireEvent.click(screen.getByRole("button", { name: "10:00" }));
 
     const form = document.querySelector("form");
     fireEvent.submit(form);
@@ -239,7 +240,7 @@ describe("Booking", () => {
           telefono: "612345678",
           servicio_id: 1,
           // servicio_nombre ya no se envía — el backend lo obtiene de BD
-          fecha_hora: expect.stringMatching(/2026-06-10T09:00:00/),
+          fecha_hora: expect.stringMatching(/2026-06-10T10:00:00/),
         })
       );
       // servicio_nombre NO debe estar en el payload (extra="forbid" en el backend)
@@ -285,7 +286,7 @@ describe("Booking", () => {
       .mockResolvedValueOnce(DISPONIBILIDAD_LIBRE)
       .mockResolvedValueOnce({
         data: {
-          slots_ocupados: ["2026-06-10T09:00:00"],
+          slots_ocupados: ["2026-06-10T10:00:00"],
           slots_libres: [],
         },
       });
@@ -300,11 +301,11 @@ describe("Booking", () => {
     await waitFor(() => {
       expect(mockGetDisponibilidad.mock.calls.length).toBeGreaterThanOrEqual(2);
       expect(mockGetDisponibilidad).toHaveBeenLastCalledWith("2026-06-10");
-      expect(screen.getByLabelText(/^hora/i)).toHaveValue("");
+      // Hora limpiada — ningún slot tiene aria-pressed="true"
+      expect(screen.queryByRole("button", { pressed: true })).not.toBeInTheDocument();
     });
-    expect(
-      screen.getByRole("option", { name: /09:00 — ocupado/i })
-    ).toBeDisabled();
+    // 10:00 debe quedar deshabilitado tras el refresco de disponibilidad
+    expect(screen.getByRole("button", { name: "10:00, ocupado" })).toBeDisabled();
   });
 
   it("usa el mensaje por defecto en un 409 sin detail", async () => {
@@ -341,7 +342,7 @@ describe("Booking", () => {
   it("muestra hint de horarios ocupados cuando hay slots ocupados", async () => {
     renderBooking();
     mockGetDisponibilidad.mockResolvedValue({
-      data: { slots_libres: ["10:00"], slots_ocupados: ["2026-06-10T09:00:00"] },
+      data: { slots_libres: ["10:00"], slots_ocupados: ["2026-06-10T10:00:00"] },
     });
     await waitForServicesLoaded();
 
@@ -359,7 +360,7 @@ describe("Booking", () => {
     mockGetDisponibilidad
       .mockResolvedValueOnce(DISPONIBILIDAD_LIBRE)
       .mockResolvedValueOnce({
-        data: { slots_libres: [], slots_ocupados: ["2026-06-11T09:00:00"] },
+        data: { slots_libres: [], slots_ocupados: ["2026-06-11T10:00:00"] },
       });
     await waitForServicesLoaded();
 
@@ -367,7 +368,7 @@ describe("Booking", () => {
       target: { value: "2026-06-10" },
     });
     await waitFor(() => expect(mockGetDisponibilidad).toHaveBeenCalled());
-    await userEvent.selectOptions(screen.getByLabelText(/^hora/i), "09:00");
+    fireEvent.click(screen.getByRole("button", { name: "10:00" }));
 
     fireEvent.change(screen.getByTestId("datepicker"), {
       target: { value: "2026-06-11" },
@@ -379,7 +380,8 @@ describe("Booking", () => {
         expect.objectContaining({ icon: "⚠️" })
       );
     });
-    expect(screen.getByLabelText(/^hora/i)).toHaveValue("");
+    // Hora limpiada — ningún slot con aria-pressed="true"
+    expect(screen.queryByRole("button", { pressed: true })).not.toBeInTheDocument();
   });
 
   it("tolera fallo al consultar disponibilidad", async () => {
@@ -392,15 +394,16 @@ describe("Booking", () => {
     });
 
     await waitFor(() => expect(mockGetDisponibilidad).toHaveBeenCalled());
-    expect(screen.getByLabelText(/^hora/i)).not.toBeDisabled();
+    // Con error de disponibilidad los slots se muestran todos como libres
+    expect(screen.getByRole("button", { name: "10:00" })).not.toBeDisabled();
   });
 
   it("muestra mensaje cuando no quedan huecos disponibles", async () => {
     renderBooking();
+    // 2026-06-10 es miércoles → slots Lun-Vie: mañana 10:00–13:30 + tarde 16:00–20:00
     const todosOcupados = [
-      "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-      "12:00", "12:30", "16:00", "16:30", "17:00", "17:30",
-      "18:00", "18:30", "19:00", "19:30",
+      "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30",
+      "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00",
     ].map((h) => `2026-06-10T${h}:00`);
     mockGetDisponibilidad.mockResolvedValue({
       data: { slots_libres: [], slots_ocupados: todosOcupados },

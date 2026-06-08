@@ -13,11 +13,11 @@ import "./Booking.css";
 
 registerLocale("es", es);
 
-const HORARIOS = [
-  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
-  "12:00", "12:30", "16:00", "16:30", "17:00", "17:30",
-  "18:00", "18:30", "19:00", "19:30",
-];
+// Lun–Vie: 10:00–14:00 (mañana) + 16:00–20:30 (tarde, último slot a las 20:00)
+const HORARIOS_MANANA_LV  = ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30"];
+const HORARIOS_TARDE_LV   = ["16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00"];
+// Sábado: 10:00–15:00 (último slot a las 14:30, servicio acaba a las 15:00)
+const HORARIOS_MANANA_SAB = ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30"];
 
 /** Formatea un objeto Date como "YYYY-MM-DD" para la API */
 const toApiDate = (date) => {
@@ -137,7 +137,12 @@ export default function Booking() {
 
   const isDisabled = (date) => date.getDay() === 0; // cerrado domingos
 
-  const slotsLibres = HORARIOS.filter((h) => !slotsOcupados.has(h)).length;
+  // Horarios disponibles según el día de la semana
+  const esSabado     = fecha?.getDay() === 6;
+  const horariosManana = esSabado ? HORARIOS_MANANA_SAB : HORARIOS_MANANA_LV;
+  const horariosTarde  = esSabado ? [] : HORARIOS_TARDE_LV;
+  const todosSlots     = [...horariosManana, ...horariosTarde];
+  const slotsLibres    = todosSlots.filter((h) => !slotsOcupados.has(h)).length;
 
   return (
     <div className="page">
@@ -225,59 +230,96 @@ export default function Booking() {
 
             <h3 style={{ marginTop: "1.5rem" }}>Fecha y hora</h3>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="booking-fecha">Fecha *</label>
-                <DatePicker
-                  id="booking-fecha"
-                  selected={fecha}
-                  onChange={setFecha}
-                  filterDate={(d) => !isDisabled(d)}
-                  minDate={new Date()}
-                  locale="es"
-                  dateFormat="dd/MM/yyyy"
-                  placeholderText="Selecciona fecha"
-                  className="datepicker-input"
-                />
-              </div>
+            <div className="form-group">
+              <label htmlFor="booking-fecha">Fecha *</label>
+              <DatePicker
+                id="booking-fecha"
+                selected={fecha}
+                onChange={setFecha}
+                filterDate={(d) => !isDisabled(d)}
+                minDate={new Date()}
+                locale="es"
+                dateFormat="dd/MM/yyyy"
+                placeholderText="Selecciona fecha"
+                className="datepicker-input"
+              />
+            </div>
 
-              <div className="form-group">
-                <label htmlFor="booking-hora">Hora *</label>
-                <select
-                  id="booking-hora"
-                  value={hora}
-                  onChange={(e) => setHora(e.target.value)}
-                  required
-                  disabled={!fecha || cargandoSlots}
-                  aria-busy={cargandoSlots}
-                >
-                  <option value="">
-                    {cargandoSlots
-                      ? "Consultando disponibilidad…"
-                      : fecha
-                      ? "Selecciona hora"
-                      : "Primero elige fecha"}
-                  </option>
-                  {HORARIOS.map((h) => {
-                    const ocupado = slotsOcupados.has(h);
-                    return (
-                      <option key={h} value={h} disabled={ocupado}>
-                        {h}{ocupado ? " — ocupado" : ""}
-                      </option>
-                    );
-                  })}
-                </select>
-                {fecha && !cargandoSlots && slotsOcupados.size > 0 && (
-                  <p className="slots-hint" aria-live="polite">
-                    {slotsLibres === 0
-                      ? "Sin huecos disponibles este día"
-                      : `${slotsOcupados.size} ${
-                          slotsOcupados.size === 1 ? "horario ocupado" : "horarios ocupados"
-                        } · ${slotsLibres} disponibles`}
-                  </p>
+            {/* Rejilla de slots — solo se muestra tras elegir fecha */}
+            {fecha && (
+              <div className="slots-section">
+                <p className="slots-label">Hora *</p>
+
+                {cargandoSlots ? (
+                  <div className="slots-loading" aria-live="polite">
+                    Consultando disponibilidad…
+                  </div>
+                ) : (
+                  <>
+                    {/* Mañana */}
+                    <p className="slots-turno">Mañana</p>
+                    <div className="slots-grid" role="group" aria-label="Horarios de mañana">
+                      {horariosManana.map((h) => {
+                        const ocupado = slotsOcupados.has(h);
+                        const sel     = hora === h;
+                        return (
+                          <button
+                            key={h}
+                            type="button"
+                            className={`slot-btn${ocupado ? " slot-btn--ocupado" : ""}${sel ? " slot-btn--selected" : ""}`}
+                            disabled={ocupado}
+                            onClick={() => setHora(h)}
+                            aria-pressed={sel}
+                            aria-label={`${h}${ocupado ? ", ocupado" : ""}`}
+                          >
+                            {h}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Tarde — solo Lun-Vie */}
+                    {horariosTarde.length > 0 && (
+                      <>
+                        <p className="slots-turno">Tarde</p>
+                        <div className="slots-grid" role="group" aria-label="Horarios de tarde">
+                          {horariosTarde.map((h) => {
+                            const ocupado = slotsOcupados.has(h);
+                            const sel     = hora === h;
+                            return (
+                              <button
+                                key={h}
+                                type="button"
+                                className={`slot-btn${ocupado ? " slot-btn--ocupado" : ""}${sel ? " slot-btn--selected" : ""}`}
+                                disabled={ocupado}
+                                onClick={() => setHora(h)}
+                                aria-pressed={sel}
+                                aria-label={`${h}${ocupado ? ", ocupado" : ""}`}
+                              >
+                                {h}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </>
+                    )}
+
+                    {/* Resumen de disponibilidad */}
+                    {slotsLibres === 0 ? (
+                      <p className="slots-hint slots-hint--full" aria-live="polite">
+                        Sin huecos disponibles este día
+                      </p>
+                    ) : slotsOcupados.size > 0 && (
+                      <p className="slots-hint" aria-live="polite">
+                        {slotsOcupados.size}{" "}
+                        {slotsOcupados.size === 1 ? "horario ocupado" : "horarios ocupados"}
+                        {" · "}{slotsLibres} disponibles
+                      </p>
+                    )}
+                  </>
                 )}
               </div>
-            </div>
+            )}
 
             <div className="form-group">
               <label htmlFor="booking-notas">Notas (opcional)</label>
@@ -304,8 +346,8 @@ export default function Booking() {
             <div className="booking-info__card card">
               <h4>Horario</h4>
               <ul>
-                <li><span>Lun – Vie</span><strong>9:00 – 20:00</strong></li>
-                <li><span>Sábado</span><strong>9:00 – 18:00</strong></li>
+                <li><span>Lun – Vie</span><strong>10:00–14:00 / 16:00–20:30</strong></li>
+                <li><span>Sábado</span><strong>10:00–15:00</strong></li>
                 <li><span>Domingo</span><strong>Cerrado</strong></li>
               </ul>
             </div>
