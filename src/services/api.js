@@ -1,35 +1,49 @@
-import axios from "axios";
+/**
+ * api.js — cliente HTTP público (sin autenticación).
+ *
+ * Convención de rutas (alineada con FastAPI):
+ *   Colecciones → con barra final:  /services/, /bookings/, /reviews/, etc.
+ *   Recursos    → sin barra final:  /bookings/{id}
+ *   Acciones    → sin barra final:  /bookings/disponibilidad
+ *
+ * Evitar rutas sin barra en colecciones: FastAPI hace un 307 redirect a la
+ * versión con barra, y algunos clientes HTTP descartan headers al seguir
+ * redirects (crítico para Authorization en rutas admin).
+ */
 
-// En dev Vite proxea "/api" al backend (vite.config.js → server.proxy).
-// En producción Docker el build recibe VITE_API_URL como build-arg
-// (p.ej. "http://localhost:8000") y se usa como base absoluta.
-const BASE = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : "/api";
+import { createClient } from "./http/client";
 
-const api = axios.create({
-  baseURL: BASE,
-  headers: { "Content-Type": "application/json" },
-});
+const api = createClient();
 
-// ── Servicios ────────────────────────────────────────────────────────────────
+// ── Servicios ─────────────────────────────────────────────────────────────────
+
 export const getServices = (categoria) =>
-  api.get("/services", { params: { categoria, solo_activos: true } });
+  api.get("/services/", { params: { categoria, solo_activos: true } });
 
-// ── Reservas ─────────────────────────────────────────────────────────────────
-export const createBooking = (data) => api.post("/bookings", data);
+// ── Reservas ──────────────────────────────────────────────────────────────────
+
+export const createBooking = (data) => api.post("/bookings/", data);
+
+/** Devuelve slots_ocupados para un día (formato "YYYY-MM-DD"). */
 export const getDisponibilidad = (fecha) =>
   api.get("/bookings/disponibilidad", { params: { fecha } });
 
-// ── Reseñas ──────────────────────────────────────────────────────────────────
-export const getReviews = () => api.get("/reviews", { params: { solo_visibles: true } });
-export const createReview = (data) => api.post("/reviews", data);
+// ── Reseñas ───────────────────────────────────────────────────────────────────
 
-// ── Galería ──────────────────────────────────────────────────────────────────
+/** Devuelve PagedResponse<ReviewOut> con solo las reseñas visibles. */
+export const getReviews = (params = {}) =>
+  api.get("/reviews/", { params: { solo_visibles: true, ...params } });
+
+export const createReview = (data) => api.post("/reviews/", data);
+
+// ── Galería ───────────────────────────────────────────────────────────────────
+
+/** Devuelve PagedResponse<GalleryImageOut>. */
 export const getGallery = (categoria) =>
-  api.get("/gallery", { params: { categoria } });
+  api.get("/gallery/", { params: { categoria } });
 
-// ── Contacto ─────────────────────────────────────────────────────────────────
-export const sendContact = (data) => api.post("/contact", data);
+// ── Contacto ──────────────────────────────────────────────────────────────────
+
+export const sendContact = (data) => api.post("/contact/", data);
 
 export default api;

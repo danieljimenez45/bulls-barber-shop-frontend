@@ -4,9 +4,16 @@
  * Cada handler simula una respuesta realista del backend FastAPI para que los
  * tests de servicios y componentes puedan ejecutarse sin servidor real.
  *
- * Convención de respuestas:
- *   - Éxito:  HttpResponse.json({ ... }, { status: 2xx })
- *   - Error:  HttpResponse.json({ detail: "..." }, { status: 4xx })
+ * Convención de rutas (alineada con FastAPI y con api.js / adminApi.js):
+ *   Colecciones → con barra final:  /api/services/, /api/bookings/, etc.
+ *   Recursos    → sin barra final:  /api/bookings/:id
+ *   Acciones    → sin barra final:  /api/bookings/export, /api/auth/login
+ *
+ * Formas de respuesta:
+ *   Colecciones paginadas → PagedResponse: { items, total, page, size, pages }
+ *   Servicios             → array plano (el backend no pagina servicios)
+ *   Éxito:  HttpResponse.json({ ... }, { status: 2xx })
+ *   Error:  HttpResponse.json({ detail: "..." }, { status: 4xx })
  */
 
 import { http, HttpResponse } from "msw";
@@ -38,7 +45,7 @@ export const mockBooking = {
   servicio_id: 1,
   servicio_nombre: "Corte Clásico",
   fecha_hora: "2026-06-10T10:00:00",
-  barbero: null,
+  barbero: "Cualquier barbero",
   notas: null,
   estado: "pendiente",
   created_at: "2026-05-25T09:00:00",
@@ -54,11 +61,13 @@ export const mockReview = {
   created_at: "2026-05-25T09:00:00",
 };
 
+// imagen_url es el nombre de campo real del backend (GalleryImageOut)
 export const mockGalleryImage = {
   id: 1,
-  url: "/uploads/foto1.jpg",
-  descripcion: "Corte moderno",
-  orden: 0,
+  imagen_url: "/uploads/gallery/foto1.jpg",
+  titulo: "Corte moderno",
+  categoria: "corte",
+  created_at: "2026-05-25T09:00:00",
 };
 
 export const mockContactMessage = {
@@ -75,6 +84,14 @@ export const mockAdminToken =
   "eyJzdWIiOiIxIiwiZXhwIjo5OTk5OTk5OTk5fQ." +
   "dummysignature";
 
+// ── Helper: PagedResponse ─────────────────────────────────────────────────────
+
+/** Envuelve un array de items en la forma paginada del backend. */
+function paged(items, { page = 1, size = 20 } = {}) {
+  const total = items.length;
+  return { items, total, page, size, pages: Math.ceil(total / size) || 1 };
+}
+
 // ── Handlers ──────────────────────────────────────────────────────────────────
 
 export const handlers = [
@@ -90,8 +107,9 @@ export const handlers = [
     return HttpResponse.json({ detail: "Credenciales incorrectas" }, { status: 401 });
   }),
 
-  // ── Services (público) ────────────────────────────────────────────────────
-  http.get(`${BASE}/api/services`, () => {
+  // ── Services (público) ─────────────────────────────────────────────────────
+  // GET devuelve array plano (no paginado) — el backend no usa PagedResponse aquí
+  http.get(`${BASE}/api/services/`, () => {
     return HttpResponse.json([mockService]);
   }),
 
@@ -102,8 +120,8 @@ export const handlers = [
     return HttpResponse.json({ detail: "No encontrado" }, { status: 404 });
   }),
 
-  // ── Services (admin) ──────────────────────────────────────────────────────
-  http.post(`${BASE}/api/services`, async ({ request }) => {
+  // ── Services (admin) ───────────────────────────────────────────────────────
+  http.post(`${BASE}/api/services/`, async ({ request }) => {
     const body = await request.json();
     return HttpResponse.json({ ...mockService, ...body, id: 99 }, { status: 201 });
   }),
@@ -117,15 +135,15 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
-  // ── Bookings (público) ────────────────────────────────────────────────────
-  http.post(`${BASE}/api/bookings`, async ({ request }) => {
+  // ── Bookings (público) ─────────────────────────────────────────────────────
+  http.post(`${BASE}/api/bookings/`, async ({ request }) => {
     const body = await request.json();
     return HttpResponse.json({ ...mockBooking, ...body, id: 10 }, { status: 201 });
   }),
 
-  // Booking.jsx solo consume slots_ocupados (ISO datetime); slots_libres es opcional.
+  // Devuelve los slots ocupados del día (la UI deshabilita esas horas)
   http.get(`${BASE}/api/bookings/disponibilidad`, ({ request }) => {
-    const url = new URL(request.url);
+    const url   = new URL(request.url);
     const fecha = url.searchParams.get("fecha");
     if (!fecha) {
       return HttpResponse.json({ detail: "fecha requerida" }, { status: 422 });
@@ -136,14 +154,9 @@ export const handlers = [
     });
   }),
 
-  // ── Bookings (admin) — colecciones con barra final (/bookings/) en adminApi ─
-  http.get(`${BASE}/api/bookings`, () => {
-    return HttpResponse.json({
-      items: [mockBooking],
-      total: 1,
-      page: 1,
-      size: 200,
-    });
+  // ── Bookings (admin) ───────────────────────────────────────────────────────
+  http.get(`${BASE}/api/bookings/`, () => {
+    return HttpResponse.json(paged([mockBooking]));
   }),
 
   http.patch(`${BASE}/api/bookings/:id`, async ({ params, request }) => {
@@ -156,28 +169,29 @@ export const handlers = [
   }),
 
   http.get(`${BASE}/api/bookings/export`, () => {
-    return new HttpResponse("id,nombre_cliente\n1,Juan García", {
-      headers: { "Content-Type": "text/csv" },
-    });
+    return new HttpResponse(
+      "id,nombre_cliente,telefono,email,servicio_nombre,fecha_hora,estado\n" +
+      "1,Juan García,612345678,juan@example.com,Corte Clásico,2026-06-10T10:00:00,pendiente",
+      { headers: { "Content-Type": "text/csv" } },
+    );
   }),
 
-  // ── Reviews (público) ─────────────────────────────────────────────────────
-  http.get(`${BASE}/api/reviews`, () => {
-    return HttpResponse.json([mockReview]);
+  // ── Reviews (público y admin — mismo endpoint, distinto query param) ────────
+  // El backend devuelve PagedResponse<ReviewOut> en ambos casos.
+  // MSW no puede distinguir por query param en un solo handler, así que
+  // devolvemos todas las reseñas; los tests específicos añaden sus propios
+  // handlers via server.use(...) cuando necesiten comportamiento diferente.
+  http.get(`${BASE}/api/reviews/`, () => {
+    return HttpResponse.json(paged([mockReview]));
   }),
 
-  http.post(`${BASE}/api/reviews`, async ({ request }) => {
+  http.post(`${BASE}/api/reviews/`, async ({ request }) => {
     const body = await request.json();
     return HttpResponse.json({ ...mockReview, ...body, id: 20 }, { status: 201 });
   }),
 
-  // ── Reviews (admin) ───────────────────────────────────────────────────────
-  http.get(`${BASE}/api/admin/reviews`, () => {
-    return HttpResponse.json([mockReview, { ...mockReview, id: 2, visible: false }]);
-  }),
-
   http.patch(`${BASE}/api/reviews/:id/visibilidad`, ({ params, request }) => {
-    const url = new URL(request.url);
+    const url     = new URL(request.url);
     const visible = url.searchParams.get("visible") === "true";
     return HttpResponse.json({ ...mockReview, id: Number(params.id), visible });
   }),
@@ -186,33 +200,36 @@ export const handlers = [
     return new HttpResponse(null, { status: 204 });
   }),
 
-  // ── Gallery ───────────────────────────────────────────────────────────────
-  http.get(`${BASE}/api/gallery`, () => {
-    return HttpResponse.json([mockGalleryImage]);
+  // ── Gallery (público y admin) ──────────────────────────────────────────────
+  // Devuelve PagedResponse<GalleryImageOut> con imagen_url (campo real del backend)
+  http.get(`${BASE}/api/gallery/`, () => {
+    return HttpResponse.json(paged([mockGalleryImage]));
   }),
 
   http.delete(`${BASE}/api/gallery/:id`, () => {
     return new HttpResponse(null, { status: 204 });
   }),
 
-  // ── Contact ───────────────────────────────────────────────────────────────
-  http.post(`${BASE}/api/contact`, async ({ request }) => {
-    const body = await request.json();
+  // Upload se prueba con XHR mockeado directamente en adminApi.test.js
+
+  // ── Contact (público) ──────────────────────────────────────────────────────
+  http.post(`${BASE}/api/contact/`, async () => {
     return HttpResponse.json(
       { ok: true, id: 30, mensaje: "Mensaje recibido" },
-      { status: 201 }
+      { status: 201 },
     );
   }),
 
-  http.get(`${BASE}/api/contact`, () => {
-    return HttpResponse.json([mockContactMessage]);
+  // ── Contact (admin) ────────────────────────────────────────────────────────
+  http.get(`${BASE}/api/contact/`, () => {
+    return HttpResponse.json(paged([mockContactMessage]));
   }),
 
   http.patch(`${BASE}/api/contact/:id/leido`, ({ params }) => {
     return HttpResponse.json({ ...mockContactMessage, id: Number(params.id), leido: true });
   }),
 
-  // ── Stats (admin) ─────────────────────────────────────────────────────────
+  // ── Stats (admin) ──────────────────────────────────────────────────────────
   http.get(`${BASE}/api/admin/stats`, () => {
     return HttpResponse.json({
       total_reservas: 10,
@@ -224,8 +241,8 @@ export const handlers = [
     });
   }),
 
-  // ── Health ────────────────────────────────────────────────────────────────
-  http.get(`${BASE}/api/health`, () => {
+  // ── Health ─────────────────────────────────────────────────────────────────
+  http.get(`${BASE}/api/health/`, () => {
     return HttpResponse.json({ status: "ok" });
   }),
 ];

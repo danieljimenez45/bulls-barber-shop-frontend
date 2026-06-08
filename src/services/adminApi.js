@@ -1,38 +1,25 @@
 /**
- * adminApi.js
- * Cliente Axios para endpoints de administración que requieren JWT.
- * El token se almacena en localStorage bajo la clave "bulls_admin_token".
+ * adminApi.js — cliente HTTP de administración (requiere JWT).
  *
- * IMPORTANTE: todos los paths de colección llevan barra final ("/bookings/")
- * para evitar que FastAPI haga un 307 redirect a la URL con barra, ya que
- * los clientes HTTP descartan el header Authorization al seguir redirects,
- * lo que provoca un 401 en endpoints protegidos.
+ * El token se almacena en localStorage bajo la clave TOKEN_KEY
+ * ("bulls_admin_token") y se inyecta automáticamente en cada petición
+ * gracias al interceptor del cliente con auth.
+ *
+ * Convención de rutas:
+ *   Colecciones → con barra final:  /bookings/, /services/, /reviews/, etc.
+ *   Recursos    → sin barra final:  /bookings/{id}, /reviews/{id}/visibilidad
+ *   Acciones    → sin barra final:  /bookings/export, /gallery/upload
+ *
+ * IMPORTANTE: las colecciones llevan barra final para evitar que FastAPI haga
+ * un 307 redirect, ya que los clientes HTTP descartan el header Authorization
+ * al seguir redirects, lo que provoca un 401 inesperado.
  */
 
-import axios from "axios";
+import { createClient, getApiBase, TOKEN_KEY } from "./http/client";
 
-// ── Base URL ──────────────────────────────────────────────────────────────────
-// En dev Vite proxea "/api" al backend (vite.config.js → server.proxy).
-// En producción Docker el build recibe VITE_API_URL como build-arg
-// (p.ej. "http://localhost:8000") y se usa como base absoluta.
-const BASE = import.meta.env.VITE_API_URL
-  ? `${import.meta.env.VITE_API_URL}/api`
-  : "/api";
+// ── Cliente con interceptor de Authorization ──────────────────────────────────
 
-// ── Cliente base con interceptor de Authorization ─────────────────────────────
-
-const adminApi = axios.create({
-  baseURL: BASE,
-  headers: { "Content-Type": "application/json" },
-});
-
-adminApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem("bulls_admin_token");
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+const adminApi = createClient({ withAuth: true });
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 
@@ -53,16 +40,17 @@ export const listBookings = ({ page = 1, size = 20, estado } = {}) =>
 /** Actualiza el estado / notas / barbero de una reserva. */
 export const updateBooking = (id, data) => adminApi.patch(`/bookings/${id}`, data);
 
-/** Soft-delete de una reserva (fija deleted_at). */
+/** Soft-delete de una reserva (fija deleted_at + estado=cancelada). */
 export const cancelBooking = (id) => adminApi.delete(`/bookings/${id}`);
 
 /**
  * Dispara la descarga del CSV de reservas en un rango de fechas.
  * Usa fetch nativo para manejar la respuesta como Blob.
+ * getApiBase() garantiza que la URL sea correcta tanto en dev como en producción.
  */
 export const exportBookingsCSV = async (desde, hasta) => {
-  const token = localStorage.getItem("bulls_admin_token");
-  const url   = `/api/bookings/export?desde=${desde}&hasta=${hasta}`;
+  const token = localStorage.getItem(TOKEN_KEY);
+  const url   = `${getApiBase()}/bookings/export?desde=${desde}&hasta=${hasta}`;
 
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${token}` },
@@ -103,7 +91,7 @@ export const listAdminReviews = ({ page = 1, size = 50 } = {}) =>
 
 /**
  * Cambia la visibilidad de una reseña.
- * @param {number} id
+ * @param {number}  id
  * @param {boolean} visible - nuevo estado deseado
  */
 export const toggleReviewVisibility = (id, visible) =>
@@ -113,7 +101,7 @@ export const deleteReview = (id) => adminApi.delete(`/reviews/${id}`);
 
 // ── Galería (admin) ───────────────────────────────────────────────────────────
 
-/** Lista imágenes de la galería (todas, sin filtro de visibilidad). */
+/** Lista imágenes de la galería (todas, sin filtro). */
 export const listGallery = ({ categoria, page = 1, size = 100 } = {}) =>
   adminApi.get("/gallery/", { params: { ...(categoria && { categoria }), page, size } });
 
@@ -123,17 +111,18 @@ export const deleteGalleryImage = (id) => adminApi.delete(`/gallery/${id}`);
 /**
  * Sube una imagen a la galería con seguimiento de progreso.
  * Usa XMLHttpRequest en lugar de fetch/axios para acceder al evento upload.onprogress.
+ * getApiBase() garantiza que la URL sea correcta tanto en dev como en producción.
  *
- * @param {FormData} formData - debe incluir: file (File), titulo (string|null), categoria (string)
+ * @param {FormData} formData  - debe incluir: file (File), titulo (string|null), categoria (string)
  * @param {(pct: number) => void} [onProgress] - callback con porcentaje 0-100
- * @returns {Promise<GalleryImageOut>} objeto imagen creado
+ * @returns {Promise<GalleryImageOut>}
  */
 export const uploadGalleryImage = (formData, onProgress) =>
   new Promise((resolve, reject) => {
-    const token = localStorage.getItem("bulls_admin_token");
+    const token = localStorage.getItem(TOKEN_KEY);
     const xhr   = new XMLHttpRequest();
 
-    xhr.open("POST", "/api/gallery/upload");
+    xhr.open("POST", `${getApiBase()}/gallery/upload`);
     xhr.setRequestHeader("Authorization", `Bearer ${token}`);
 
     if (onProgress) {
@@ -158,7 +147,7 @@ export const uploadGalleryImage = (formData, onProgress) =>
     xhr.send(formData);
   });
 
-// ── Mensajes de contacto (admin) ─────────────────────────────────────────────
+// ── Mensajes de contacto (admin) ──────────────────────────────────────────────
 
 /**
  * Lista mensajes de contacto paginados.

@@ -7,6 +7,10 @@
  *
  * No hacemos peticiones reales: lo que testamos aquí es el "contrato" de la
  * capa de servicio (rutas, params, headers), no el backend.
+ *
+ * Convención de rutas verificada:
+ *   Colecciones → barra final:  /services/, /bookings/, /reviews/, /gallery/, /contact/
+ *   Acciones    → sin barra:    /bookings/disponibilidad
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -51,16 +55,16 @@ describe("api.js — capa de servicio pública", () => {
   // ── getServices ─────────────────────────────────────────────────────────────
 
   describe("getServices", () => {
-    it("llama a GET /services con solo_activos=true", () => {
+    it("llama a GET /services/ con solo_activos=true", () => {
       getServices();
-      expect(mockGet).toHaveBeenCalledWith("/services", {
+      expect(mockGet).toHaveBeenCalledWith("/services/", {
         params: { categoria: undefined, solo_activos: true },
       });
     });
 
     it("pasa el filtro de categoría cuando se proporciona", () => {
       getServices("corte");
-      expect(mockGet).toHaveBeenCalledWith("/services", {
+      expect(mockGet).toHaveBeenCalledWith("/services/", {
         params: { categoria: "corte", solo_activos: true },
       });
     });
@@ -82,9 +86,9 @@ describe("api.js — capa de servicio pública", () => {
       fecha_hora: "2026-06-10T10:00:00",
     };
 
-    it("llama a POST /bookings con el payload correcto", () => {
+    it("llama a POST /bookings/ con el payload correcto", () => {
       createBooking(payload);
-      expect(mockPost).toHaveBeenCalledWith("/bookings", payload);
+      expect(mockPost).toHaveBeenCalledWith("/bookings/", payload);
     });
 
     it("devuelve la promesa de axios", () => {
@@ -96,7 +100,7 @@ describe("api.js — capa de servicio pública", () => {
   // ── getDisponibilidad ───────────────────────────────────────────────────────
 
   describe("getDisponibilidad", () => {
-    it("llama a GET /bookings/disponibilidad con el param fecha", () => {
+    it("llama a GET /bookings/disponibilidad con el param fecha (sin barra final — acción)", () => {
       getDisponibilidad("2026-06-10");
       expect(mockGet).toHaveBeenCalledWith("/bookings/disponibilidad", {
         params: { fecha: "2026-06-10" },
@@ -107,10 +111,17 @@ describe("api.js — capa de servicio pública", () => {
   // ── getReviews ──────────────────────────────────────────────────────────────
 
   describe("getReviews", () => {
-    it("llama a GET /reviews con solo_visibles=true", () => {
+    it("llama a GET /reviews/ con solo_visibles=true", () => {
       getReviews();
-      expect(mockGet).toHaveBeenCalledWith("/reviews", {
+      expect(mockGet).toHaveBeenCalledWith("/reviews/", {
         params: { solo_visibles: true },
+      });
+    });
+
+    it("permite pasar params adicionales (page, size)", () => {
+      getReviews({ page: 1, size: 3 });
+      expect(mockGet).toHaveBeenCalledWith("/reviews/", {
+        params: { solo_visibles: true, page: 1, size: 3 },
       });
     });
   });
@@ -118,26 +129,26 @@ describe("api.js — capa de servicio pública", () => {
   // ── createReview ────────────────────────────────────────────────────────────
 
   describe("createReview", () => {
-    it("llama a POST /reviews con los datos correctos", () => {
+    it("llama a POST /reviews/ con los datos correctos", () => {
       const data = { nombre: "Carlos", comentario: "Muy bien", valoracion: 5 };
       createReview(data);
-      expect(mockPost).toHaveBeenCalledWith("/reviews", data);
+      expect(mockPost).toHaveBeenCalledWith("/reviews/", data);
     });
   });
 
   // ── getGallery ──────────────────────────────────────────────────────────────
 
   describe("getGallery", () => {
-    it("llama a GET /gallery sin categoría", () => {
+    it("llama a GET /gallery/ sin categoría", () => {
       getGallery();
-      expect(mockGet).toHaveBeenCalledWith("/gallery", {
+      expect(mockGet).toHaveBeenCalledWith("/gallery/", {
         params: { categoria: undefined },
       });
     });
 
     it("pasa la categoría cuando se proporciona", () => {
       getGallery("barba");
-      expect(mockGet).toHaveBeenCalledWith("/gallery", {
+      expect(mockGet).toHaveBeenCalledWith("/gallery/", {
         params: { categoria: "barba" },
       });
     });
@@ -146,10 +157,10 @@ describe("api.js — capa de servicio pública", () => {
   // ── sendContact ─────────────────────────────────────────────────────────────
 
   describe("sendContact", () => {
-    it("llama a POST /contact con el mensaje", () => {
+    it("llama a POST /contact/ con el mensaje", () => {
       const data = { nombre: "Ana", email: "ana@example.com", mensaje: "Hola" };
       sendContact(data);
-      expect(mockPost).toHaveBeenCalledWith("/contact", data);
+      expect(mockPost).toHaveBeenCalledWith("/contact/", data);
     });
   });
 });
