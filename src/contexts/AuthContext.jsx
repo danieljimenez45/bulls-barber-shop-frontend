@@ -171,6 +171,14 @@ export function AuthProvider({ children }) {
     };
   }, [token, scheduleAutoLogout]);
 
+  // Escuchar el CustomEvent emitido por el interceptor 401 de Axios.
+  // Desacopla la capa HTTP del contexto de autenticación.
+  useEffect(() => {
+    const handleAxios401 = () => clearAuth();
+    window.addEventListener("auth:logout", handleAxios401);
+    return () => window.removeEventListener("auth:logout", handleAxios401);
+  }, [clearAuth]);
+
   // ── Acciones públicas ──────────────────────────────────────────────────────
 
   /**

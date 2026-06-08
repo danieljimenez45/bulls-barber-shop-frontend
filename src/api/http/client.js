@@ -85,8 +85,8 @@ export function createClient({ withAuth = false } = {}) {
   });
 
   if (withAuth) {
-    // El interceptor se ejecuta en cada petición, no al crear el cliente,
-    // por lo que siempre lee el token actualizado de localStorage.
+    // Interceptor de REQUEST: añade el JWT en cada llamada protegida.
+    // Se ejecuta en cada petición para leer siempre el token actualizado.
     client.interceptors.request.use((config) => {
       const token = localStorage.getItem(TOKEN_KEY);
       if (token) {
@@ -94,6 +94,18 @@ export function createClient({ withAuth = false } = {}) {
       }
       return config;
     });
+
+    // Interceptor de RESPONSE: detecta 401 y notifica al AuthContext
+    // mediante un CustomEvent, sin acoplamiento directo entre capas.
+    client.interceptors.response.use(
+      (res) => res,
+      (err) => {
+        if (err.response?.status === 401) {
+          window.dispatchEvent(new CustomEvent("auth:logout"));
+        }
+        return Promise.reject(err);
+      },
+    );
   }
 
   return client;

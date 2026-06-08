@@ -230,25 +230,31 @@ function BookingCard({ booking, onEstadoChange, updating }) {
 // ── Componente principal ──────────────────────────────────────────────────────
 
 export default function AdminReservas() {
-  const [allBookings,   setAllBookings]   = useState([]);
+  // Datos de la página actual (server-side)
+  const [items,         setItems]         = useState([]);
+  const [total,         setTotal]         = useState(0);
+  const [counts,        setCounts]        = useState({ "": 0 });
   const [loading,       setLoading]       = useState(true);
   const [filtroEstado,  setFiltroEstado]  = useState("");
   const [searchQuery,   setSearchQuery]   = useState("");
   const [page,          setPage]          = useState(1);
   const [showExport,    setShowExport]    = useState(false);
   const [updatingId,    setUpdatingId]    = useState(null);
-  const [cancelTarget,  setCancelTarget]  = useState(null);  // booking a cancelar
+  const [cancelTarget,  setCancelTarget]  = useState(null);
   const [cancelLoading, setCancelLoading] = useState(false);
 
-  // ── Carga de datos ────────────────────────────────────────────────────────
-  // Cargamos un lote amplio y filtramos client-side para que la búsqueda
-  // y los chips de filtro funcionen sobre el conjunto completo.
+  // ── Carga de datos (server-side) ──────────────────────────────────────────
 
-  const fetchBookings = useCallback(async () => {
+  const fetchPage = useCallback(async (p, estado) => {
     setLoading(true);
     try {
-      const { data } = await listBookings({ page: 1, size: 200 });
-      setAllBookings(data.items ?? []);
+      const { data } = await listBookings({
+        page: p,
+        size: PAGE_SIZE,
+        estado: estado || undefined,
+      });
+      setItems(data.items ?? []);
+      setTotal(data.total ?? 0);
     } catch {
       toast.error("Error al cargar las reservas");
     } finally {
@@ -256,41 +262,50 @@ export default function AdminReservas() {
     }
   }, []);
 
-  useEffect(() => { fetchBookings(); }, [fetchBookings]);
+  // Fetch conteos por estado (peticiones pequeñas, una vez al montar y tras mutaciones)
+  const fetchCounts = useCallback(async () => {
+    try {
+      const results = await Promise.all([
+        listBookings({ page: 1, size: 1 }),
+        ...ESTADOS.map((e) => listBookings({ page: 1, size: 1, estado: e })),
+      ]);
+      const [all, ...perEstado] = results;
+      setCounts({
+        "": all.data.total ?? 0,
+        ...Object.fromEntries(ESTADOS.map((e, i) => [e, perEstado[i].data.total ?? 0])),
+      });
+    } catch { /* silenciar — los chips funcionan sin conteos */ }
+  }, []);
 
-  // ── Filtrado y búsqueda (client-side) ─────────────────────────────────────
+  // Carga inicial
+  useEffect(() => {
+    fetchPage(1, "");
+    fetchCounts();
+  }, [fetchPage, fetchCounts]);
 
-  const filtered = useMemo(() => {
-    let result = allBookings;
-    if (filtroEstado) {
-      result = result.filter((b) => b.estado === filtroEstado);
-    }
+  // Al cambiar filtro → volver a página 1
+  useEffect(() => {
+    setPage(1);
+    fetchPage(1, filtroEstado);
+  }, [filtroEstado]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Al cambiar de página
+  useEffect(() => {
+    fetchPage(page, filtroEstado);
+  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Búsqueda client-side sobre los items de la página actual
+  const paginated = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
-    if (q) {
-      result = result.filter(
-        (b) =>
-          b.nombre_cliente?.toLowerCase().includes(q) ||
-          b.telefono?.includes(q),
-      );
-    }
-    return result;
-  }, [allBookings, filtroEstado, searchQuery]);
+    if (!q) return items;
+    return items.filter(
+      (b) =>
+        b.nombre_cliente?.toLowerCase().includes(q) ||
+        b.telefono?.includes(q),
+    );
+  }, [items, searchQuery]);
 
-  // Reiniciar a página 1 cuando cambia filtro o búsqueda
-  useEffect(() => { setPage(1); }, [filtroEstado, searchQuery]);
-
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-  const paginated  = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return filtered.slice(start, start + PAGE_SIZE);
-  }, [filtered, page]);
-
-  // Conteos por estado para los chips
-  const counts = useMemo(() => {
-    const c = { "": allBookings.length };
-    ESTADOS.forEach((e) => { c[e] = allBookings.filter((b) => b.estado === e).length; });
-    return c;
-  }, [allBookings]);
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   // ── Acciones ──────────────────────────────────────────────────────────────
 
@@ -299,20 +314,22 @@ export default function AdminReservas() {
     setUpdatingId(booking.id);
     try {
       await updateBooking(booking.id, { estado: nuevoEstado });
-      setAllBookings((prev) =>
+      // Actualizar optimistamente en la lista local
+      setItems((prev) =>
         prev.map((b) => (b.id === booking.id ? { ...b, estado: nuevoEstado } : b)),
       );
       toast.success(`Reserva actualizada → ${ESTADO_CFG[nuevoEstado]?.label}`);
+      fetchCounts();
     } catch {
       toast.error("No se pudo actualizar la reserva");
     } finally {
       setUpdatingId(null);
     }
-  }, []);
+  }, [fetchCounts]);
 
   const handleEstadoChange = useCallback((booking, nuevoEstado) => {
     if (nuevoEstado === "cancelada") {
-      setCancelTarget(booking);   // A-09: abre modal de confirmación
+      setCancelTarget(booking);
     } else {
       applyEstadoChange(booking, nuevoEstado);
     }
@@ -323,17 +340,18 @@ export default function AdminReservas() {
     setCancelLoading(true);
     try {
       await cancelBooking(cancelTarget.id);
-      setAllBookings((prev) =>
+      setItems((prev) =>
         prev.map((b) => (b.id === cancelTarget.id ? { ...b, estado: "cancelada" } : b)),
       );
       toast.success("Reserva cancelada");
       setCancelTarget(null);
+      fetchCounts();
     } catch {
       toast.error("No se pudo cancelar la reserva");
     } finally {
       setCancelLoading(false);
     }
-  }, [cancelTarget]);
+  }, [cancelTarget, fetchCounts]);
 
   // ── Render ────────────────────────────────────────────────────────────────
 
@@ -343,7 +361,7 @@ export default function AdminReservas() {
       {/* ── Cabecera ──────────────────────────────────────────────────── */}
       <div className="ar-header">
         <div className="ar-header-left">
-          <span className="ar-total">{allBookings.length} reservas</span>
+          <span className="ar-total">{counts[""] ?? 0} reservas</span>
         </div>
         <div className="ar-header-right">
           {/* Búsqueda */}
@@ -401,9 +419,9 @@ export default function AdminReservas() {
       {/* ── Resultado de búsqueda ─────────────────────────────────────── */}
       {searchQuery && !loading && (
         <p className="ar-search-result">
-          {filtered.length === 0
-            ? `Sin resultados para "${searchQuery}"`
-            : `${filtered.length} resultado${filtered.length !== 1 ? "s" : ""} para "${searchQuery}"`}
+          {paginated.length === 0
+            ? `Sin resultados para "${searchQuery}" en esta página`
+            : `${paginated.length} resultado${paginated.length !== 1 ? "s" : ""} para "${searchQuery}"`}
         </p>
       )}
 

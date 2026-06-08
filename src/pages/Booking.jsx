@@ -19,8 +19,6 @@ const HORARIOS = [
   "18:00", "18:30", "19:00", "19:30",
 ];
 
-const BARBEROS = ["Cualquier barbero", "Barbero 1", "Barbero 2"];
-
 /** Formatea un objeto Date como "YYYY-MM-DD" para la API */
 const toApiDate = (date) => {
   const y = date.getFullYear();
@@ -32,6 +30,15 @@ const toApiDate = (date) => {
 /** Extrae "HH:MM" de un string ISO datetime devuelto por el backend */
 const isoToHHMM = (isoString) => isoString.substring(11, 16);
 
+/**
+ * Construye un string datetime local sin zona horaria ("YYYY-MM-DDTHH:MM:00").
+ * Evita que toISOString() convierta a UTC y desfase la hora en la BD.
+ */
+const toLocalIso = (date, hhmm) => {
+  const pad = (n) => String(n).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${hhmm}:00`;
+};
+
 export default function Booking() {
   const { data: services } = useApi(() => getServices(), []);
 
@@ -40,7 +47,6 @@ export default function Booking() {
     telefono: "",
     email: "",
     servicio_id: "",
-    barbero: "Cualquier barbero",
     notas: "",
   });
   const [fecha, setFecha] = useState(null);
@@ -90,19 +96,12 @@ export default function Booking() {
       return toast.error("Rellena los campos obligatorios");
     if (!form.servicio_id) return toast.error("Selecciona un servicio");
 
-    const [h, m] = hora.split(":").map(Number);
-    const fechaHora = new Date(fecha);
-    fechaHora.setHours(h, m, 0, 0);
-
-    const servicio = services?.find((s) => s.id === Number(form.servicio_id));
-
     setEnviando(true);
     try {
       await createBooking({
         ...form,
         servicio_id: Number(form.servicio_id),
-        servicio_nombre: servicio?.nombre ?? "",
-        fecha_hora: fechaHora.toISOString(),
+        fecha_hora: toLocalIso(fecha, hora),
       });
       toast.success("¡Reserva enviada! Te confirmaremos por teléfono.");
       setForm({
@@ -110,7 +109,6 @@ export default function Booking() {
         telefono: "",
         email: "",
         servicio_id: "",
-        barbero: "Cualquier barbero",
         notas: "",
       });
       setFecha(null);
@@ -221,19 +219,6 @@ export default function Booking() {
                   <option key={s.id} value={s.id}>
                     {s.nombre} — {s.precio} €
                   </option>
-                ))}
-              </select>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="booking-barbero">Barbero</label>
-              <select
-                id="booking-barbero"
-                value={form.barbero}
-                onChange={(e) => setForm({ ...form, barbero: e.target.value })}
-              >
-                {BARBEROS.map((b) => (
-                  <option key={b} value={b}>{b}</option>
                 ))}
               </select>
             </div>
